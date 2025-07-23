@@ -9,8 +9,8 @@ class DashboardViewModel: ObservableObject {
     @Published var chartData: [DonutChartData] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
-    @Published var selectedDateFilter: DashboardDateType = .last7Days
-    @Published var availableFilters: [DashboardDateFilter] = DashboardDateFilter.allFilters
+    @Published var selectedDateFilter: DashboardDateType = DateFilterManager.defaultDashboardFilter
+    @Published var availableFilters: [DashboardDateFilter] = DateFilterManager.availableFilters
     
     // System Alarm Trend Properties
     @Published var systemAlarmTrendData: SystemAlarmTrendData?
@@ -83,7 +83,7 @@ class DashboardViewModel: ObservableObject {
     }
     
     func getLocalizedFilterTitle(_ dateType: DashboardDateType) -> String {
-        return dateType.localizationKey.localized(language: nil)
+        return DateFilterManager.getLocalizedTitle(for: dateType)
     }
     
     func loadSystemAlarmTrend() async {

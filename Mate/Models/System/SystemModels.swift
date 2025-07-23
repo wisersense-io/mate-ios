@@ -479,3 +479,56 @@ extension System {
         )
     ]
 } 
+
+// MARK: - System Detail Health Score Trend Models
+
+struct SystemDetailTrendResponse: Codable {
+    let data: [SystemDetailTrendData]
+    let errorCode: Int
+    let hasError: Bool
+}
+
+struct SystemDetailTrendData: Codable, Identifiable {
+    let dt: String  // Date in format "20250708000000"
+    let v: Double   // Health score value
+    
+    var id: String { dt }
+    
+    // Convert dt string to Date
+    var date: Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMddHHmmss"
+        return formatter.date(from: dt) ?? Date()
+    }
+    
+    // Formatted date for display
+    var displayDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd"
+        return formatter.string(from: date)
+    }
+    
+    // Health score rounded to 2 decimal places
+    var healthScore: Double {
+        return (v * 100).rounded() / 100  // Round to 2 decimal places: 9.516... → 9.52
+    }
+}
+
+// MARK: - Extension for SimpleLineChart Integration
+
+extension SystemDetailTrendData {
+    // Convert to HealthScoreTrendItem for SimpleLineChart usage
+    func toHealthScoreTrendItem() -> HealthScoreTrendItem {
+        return HealthScoreTrendItem(
+            label: displayDate,  // "MMM dd" format from SystemDetailTrendData
+            value: healthScore   // Rounded health score value
+        )
+    }
+}
+
+extension Array where Element == SystemDetailTrendData {
+    // Convert array of SystemDetailTrendData to HealthScoreTrendItem array
+    func toHealthScoreTrendItems() -> [HealthScoreTrendItem] {
+        return self.map { $0.toHealthScoreTrendItem() }
+    }
+} 

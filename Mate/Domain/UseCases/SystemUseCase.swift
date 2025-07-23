@@ -21,4 +21,11 @@ class SystemUseCase {
     func prepareDevices(from systems: [System]) -> [DeviceInfo] {
         return systems.prepareDevices()
     }
+    
+    func getSystemHealthScoreTrend(systemId: String, dateType: Int) async throws -> [SystemDetailTrendData] {
+        return try await systemRepository.getSystemHealthScoreTrend(
+            systemId: systemId,
+            dateType: dateType
+        )
+    }
 } 

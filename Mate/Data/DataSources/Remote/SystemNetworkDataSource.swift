@@ -3,6 +3,7 @@ import Foundation
 // MARK: - System Network Data Source Protocol
 protocol SystemNetworkDataSourceProtocol {
     func fetchSystems(organizationId: String, filter: Int, skip: Int, take: Int) async throws -> SystemsResponse
+    func fetchSystemHealthScoreTrend(systemId: String, dateType: Int) async throws -> SystemDetailTrendResponse
 }
 
 // MARK: - System Network Data Source Implementation
@@ -70,6 +71,58 @@ class SystemNetworkDataSource: SystemNetworkDataSourceProtocol {
             throw error
         } catch {
             print("❌ SystemNetworkDataSource: Network error: \(error)")
+            throw AuthError.networkError
+        }
+    }
+    
+    func fetchSystemHealthScoreTrend(systemId: String, dateType: Int) async throws -> SystemDetailTrendResponse {
+        // Build URL
+        let endpoint = "/mobile/systems/trend/healthScore"
+        let urlString = "\(baseURL)\(endpoint)/\(systemId)/\(dateType)"
+        
+        guard let url = URL(string: urlString) else {
+            throw AuthError.invalidURL
+        }
+        
+        print("🌐 SystemNetworkDataSource: Fetching system health score trend from: \(urlString)")
+        
+        // Create request
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        // Add authorization header
+        if let token = tokenStorage.getToken() {
+            request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
+        }
+        
+        // Add headers
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        do {
+            let (data, response) = try await urlSession.data(for: request)
+            
+            // Check HTTP status
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AuthError.invalidResponse
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                throw AuthError.serverError("HTTP Error: \(httpResponse.statusCode)", errorCode: httpResponse.statusCode)
+            }
+            
+            let decoder = JSONDecoder()
+            let trendResponse = try decoder.decode(SystemDetailTrendResponse.self, from: data)
+            
+            return trendResponse
+            
+        } catch let decodingError as DecodingError {
+            print("❌ SystemNetworkDataSource: System health score trend decoding error: \(decodingError)")
+            throw AuthError.invalidResponse
+        } catch let error as AuthError {
+            throw error
+        } catch {
+            print("❌ SystemNetworkDataSource: System health score trend network error: \(error)")
             throw AuthError.networkError
         }
     }

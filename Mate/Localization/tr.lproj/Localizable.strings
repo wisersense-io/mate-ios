@@ -100,7 +100,7 @@
 
 /* Health Score Trend */
 "loading_trend_data" = "Trend Verileri Yükleniyor...";
-"weekly_trend" = "Sağlık Skoru Trendi";
+"health_score_trend" = "Sağlık Skoru Trendi";
 "no_data_available" = "Veri Bulunmuyor";
 "scroll_to_see_more" = "Daha fazlası için kaydırın";
 

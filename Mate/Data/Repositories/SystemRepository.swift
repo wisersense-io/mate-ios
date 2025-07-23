@@ -17,4 +17,13 @@ class SystemRepository: SystemRepositoryProtocol {
         
         return systemsResponse.data
     }
+    
+    func getSystemHealthScoreTrend(systemId: String, dateType: Int) async throws -> [SystemDetailTrendData] {
+        let trendResponse = try await networkDataSource.fetchSystemHealthScoreTrend(
+            systemId: systemId,
+            dateType: dateType
+        )
+        
+        return trendResponse.data
+    }
 } 

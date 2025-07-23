@@ -5,6 +5,7 @@ struct SystemCard: View {
     let isAlive: Bool
     let isDeviceConnected: Bool
     @EnvironmentObject var themeManager: ThemeManager
+    @State private var navigateToSystemDetail = false
     
     // Default initializer for backward compatibility
     init(system: System, isAlive: Bool = false, isDeviceConnected: Bool = false) {
@@ -82,5 +83,16 @@ struct SystemCard: View {
         .background(themeManager.currentColors.mainBgColor)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onTapGesture {
+            navigateToSystemDetail = true
+        }
+        .fullScreenCover(isPresented: $navigateToSystemDetail) {
+            SystemDetailView(
+                system: system,
+                isAlive: isAlive,
+                isDeviceConnected: isDeviceConnected
+            )
+            .environmentObject(themeManager)
+        }
     }
 }

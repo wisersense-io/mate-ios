@@ -77,7 +77,7 @@ struct HomeView: View {
                             )
                     } else {
                         SimpleLineChart(
-                            title: "weekly_trend".localized(language: localizationManager.currentLanguage),
+                            title: "health_score_trend".localized(language: localizationManager.currentLanguage),
                             trendData: homeViewModel.healthScoreTrendData
                         )
                         .environmentObject(themeManager)
