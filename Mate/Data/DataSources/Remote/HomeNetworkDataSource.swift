@@ -24,11 +24,8 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchDashboardInfo(organizationId: String) async throws -> HomeDashboardInfoResponseDTO {
-        // Check if user is logged in
-        let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        
         // Check current token
-        if let token = DIContainer.shared.getCurrentToken() {
+        if DIContainer.shared.getCurrentToken() != nil {
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
@@ -122,11 +119,8 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchHealthScore(organizationId: String, isWeighted: Bool) async throws -> HealthScoreResponseDTO {
-        // Check if user is logged in
-        let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        
         // Check current token
-        if let token = DIContainer.shared.getCurrentToken() {
+        if DIContainer.shared.getCurrentToken() != nil {
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
@@ -219,11 +213,8 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchHealthScoreTrend(organizationId: String, dateType: DateType = .last7Days, resolutionType: DateResolutionType = .daily) async throws -> HealthScoreTrendResponseDTO {
-        // Check if user is logged in
-        let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        
         // Check current token
-        if let token = DIContainer.shared.getCurrentToken() {
+        if DIContainer.shared.getCurrentToken() != nil {
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
