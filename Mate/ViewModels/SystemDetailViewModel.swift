@@ -71,12 +71,14 @@ class SystemDetailViewModel: ObservableObject {
         return organizationUseCase.getSelectedOrganization()
     }
     
-    func checkAndRefreshIfOrganizationChanged() async {
+    func checkAndRefreshIfOrganizationChanged() async -> Bool {
         if let newOrganizationId = getOrganizationId(),
            newOrganizationId != currentOrganizationId {
             currentOrganizationId = newOrganizationId
             await loadHealthScoreTrend()
+            return true // Data was refreshed
         }
+        return false // No refresh needed
     }
     
     // MARK: - Helper Methods

@@ -34,8 +34,6 @@ class HomeViewModel: ObservableObject {
     }
     
     func loadDashboardData() async {
-        print("🔄 HomeViewModel: loadDashboardData called")
-        
         // Cancel any existing task
         currentTask?.cancel()
         
@@ -48,8 +46,6 @@ class HomeViewModel: ObservableObject {
     }
     
     func loadHealthScore() async {
-        print("🔄 HomeViewModel: loadHealthScore called")
-        
         // Cancel any existing health score task
         healthScoreTask?.cancel()
         
@@ -62,8 +58,6 @@ class HomeViewModel: ObservableObject {
     }
     
     func loadHealthScoreTrend() async {
-        print("🔄 HomeViewModel: loadHealthScoreTrend called")
-        
         // Cancel any existing trend task
         trendTask?.cancel()
         
@@ -76,13 +70,11 @@ class HomeViewModel: ObservableObject {
     }
     
     private func performHealthScoreLoad() async {
-        print("📊 Starting performHealthScoreLoad...")
         isHealthScoreLoading = true
         healthScoreError = nil
         
         // Check if task is cancelled
         if Task.isCancelled {
-            print("⏹️ Health Score task was cancelled before starting")
             isHealthScoreLoading = false
             return
         }
@@ -90,7 +82,6 @@ class HomeViewModel: ObservableObject {
         do {
             // Check if task is cancelled before API call
             if Task.isCancelled {
-                print("⏹️ Health Score task was cancelled before API call")
                 isHealthScoreLoading = false
                 return
             }
@@ -99,25 +90,21 @@ class HomeViewModel: ObservableObject {
             
             // Check if task is cancelled after API call
             if Task.isCancelled {
-                print("⏹️ Health Score task was cancelled after API call")
                 isHealthScoreLoading = false
                 return
             }
             
             // Update health score
             healthScore = healthScoreResult.score
-            print("✅ Health Score loaded successfully: \(healthScore)")
             
         } catch {
             // Don't show error if task was cancelled
             if Task.isCancelled {
-                print("⏹️ Health Score task was cancelled, ignoring error")
                 isHealthScoreLoading = false
                 return
             }
             
             healthScoreError = error.localizedDescription
-            print("❌ Health Score loading error: \(error)")
             
             // Additional error details
             if let apiError = error as? APIError {
@@ -130,26 +117,18 @@ class HomeViewModel: ObservableObject {
     }
     
     private func performDataLoad() async {
-        print("📥 Starting performDataLoad...")
         isLoading = true
         errorMessage = nil
         
         // Check if task is cancelled
         if Task.isCancelled {
-            print("⏹️ Task was cancelled before starting")
             isLoading = false
             return
         }
         
-        // Check session state
-        print("👤 Current User: \(UserSessionManager.shared.currentUser?.name ?? "None")")
-        print("🏢 Current Org ID: \(UserSessionManager.shared.getCurrentOrganizationId() ?? "None")")
-        print("🔐 Is Logged In: \(UserSessionManager.shared.isLoggedIn)")
-        
         do {
             // Check if task is cancelled before API call
             if Task.isCancelled {
-                print("⏹️ Task was cancelled before API call")
                 isLoading = false
                 return
             }
@@ -158,7 +137,6 @@ class HomeViewModel: ObservableObject {
             
             // Check if task is cancelled after API call
             if Task.isCancelled {
-                print("⏹️ Task was cancelled after API call")
                 isLoading = false
                 return
             }
@@ -168,12 +146,10 @@ class HomeViewModel: ObservableObject {
             
             // Convert to dashboard items
             dashboardItems = dashboardInfo.toDashboardItems(language: currentLanguage)
-            print("✅ Dashboard data loaded successfully with \(dashboardItems.count) items")
             
         } catch {
             // Don't show error if task was cancelled
             if Task.isCancelled {
-                print("⏹️ Task was cancelled, ignoring error")
                 isLoading = false
                 return
             }
@@ -192,13 +168,11 @@ class HomeViewModel: ObservableObject {
     }
     
     private func performTrendLoad() async {
-        print("📈 Starting performTrendLoad...")
         isTrendLoading = true
         trendError = nil
         
         // Check if task is cancelled
         if Task.isCancelled {
-            print("⏹️ Trend task was cancelled before starting")
             isTrendLoading = false
             return
         }
@@ -206,7 +180,6 @@ class HomeViewModel: ObservableObject {
         do {
             // Check if task is cancelled before API call
             if Task.isCancelled {
-                print("⏹️ Trend task was cancelled before API call")
                 isTrendLoading = false
                 return
             }
@@ -215,19 +188,16 @@ class HomeViewModel: ObservableObject {
             
             // Check if task is cancelled after API call
             if Task.isCancelled {
-                print("⏹️ Trend task was cancelled after API call")
                 isTrendLoading = false
                 return
             }
             
             // Update trend data
             healthScoreTrendData = trendResult.items
-            print("✅ Health Score Trend loaded successfully with \(healthScoreTrendData.count) data points")
             
         } catch {
             // Don't show error if task was cancelled
             if Task.isCancelled {
-                print("⏹️ Trend task was cancelled, ignoring error")
                 isTrendLoading = false
                 return
             }
@@ -247,24 +217,23 @@ class HomeViewModel: ObservableObject {
     
     // MARK: - Organization Management
     
-    func checkAndRefreshIfOrganizationChanged() async {
+    func checkAndRefreshIfOrganizationChanged() async -> Bool {
         let currentOrganizationId = organizationUseCase.getActiveOrganization()
         
         if currentOrganizationId != lastUsedOrganizationId {
-            print("🔄 HomeViewModel: Organization changed from \(lastUsedOrganizationId ?? "nil") to \(currentOrganizationId ?? "nil")")
             lastUsedOrganizationId = currentOrganizationId
             
             // Refresh all data when organization changes
             await refreshAllData()
+            return true // Data was refreshed
         }
+        return false // No refresh needed
     }
     
     private func refreshAllData() async {
-        print("🔄 HomeViewModel: Refreshing all data due to organization change")
-        
-        // Load all data in parallel
-        async let _ = loadDashboardData()
-        async let _ = loadHealthScore()
-        async let _ = loadHealthScoreTrend()
+        // Load all data sequentially to avoid race conditions
+        await loadDashboardData()
+        await loadHealthScore()
+        await loadHealthScoreTrend()
     }
 } 

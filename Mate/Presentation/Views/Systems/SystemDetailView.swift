@@ -67,8 +67,10 @@ struct SystemDetailView: View {
                             
                             Button("Tekrar Dene") {
                                 Task {
-                                    await viewModel.checkAndRefreshIfOrganizationChanged()
-                                    await viewModel.refreshHealthScoreTrend()
+                                    let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                    if !organizationChanged {
+                                        await viewModel.refreshHealthScoreTrend()
+                                    }
                                 }
                             }
                             .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -124,8 +126,10 @@ struct SystemDetailView: View {
                         ForEach(viewModel.availableFilters, id: \.dateType) { filter in
                             Button(action: {
                                 Task {
-                                    await viewModel.checkAndRefreshIfOrganizationChanged()
-                                    await viewModel.updateDateFilter(filter.dateType)
+                                    let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                    if !organizationChanged {
+                                        await viewModel.updateDateFilter(filter.dateType)
+                                    }
                                 }
                             }) {
                                 HStack {
@@ -163,13 +167,20 @@ struct SystemDetailView: View {
             print("📱 SystemDetailView: Initial task triggered")
             
             // Check if organization changed and refresh if needed
-            await viewModel.checkAndRefreshIfOrganizationChanged()
+            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
             
-            await viewModel.loadHealthScoreTrend()
+            // Only load data if organization didn't change (to avoid race condition)
+            if !organizationChanged {
+                await viewModel.loadHealthScoreTrend()
+            }
         }
         .refreshable {
-            await viewModel.checkAndRefreshIfOrganizationChanged()
-            await viewModel.refreshHealthScoreTrend()
+            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+            
+            // Only refresh if organization didn't change (to avoid race condition)
+            if !organizationChanged {
+                await viewModel.refreshHealthScoreTrend()
+            }
         }
     }
     

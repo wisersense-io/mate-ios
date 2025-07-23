@@ -76,9 +76,11 @@ struct SystemsView: View {
             print("📱 SystemsView: Initial task triggered")
             
             // Check if organization changed and refresh if needed
-            await viewModel.checkAndRefreshIfOrganizationChanged()
+            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
             
-            await viewModel.loadSystems()
+            if !organizationChanged {
+                await viewModel.loadSystems()
+            }
             // Start SignalR connection after loading systems
             await viewModel.startSignalRConnection()
         }
@@ -138,8 +140,10 @@ struct SystemsView: View {
             } else if let errorMessage = viewModel.errorMessage {
                 ErrorView(message: errorMessage) {
                     Task {
-                        await viewModel.checkAndRefreshIfOrganizationChanged()
-                        await viewModel.loadSystems()
+                        let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                        if !organizationChanged {
+                            await viewModel.loadSystems()
+                        }
                     }
                 }
                 .environmentObject(themeManager)
@@ -156,6 +160,7 @@ struct SystemsView: View {
                                 isDeviceConnected: viewModel.isDeviceConnected(system.id)
                             )
                                 .environmentObject(themeManager)
+                                .environmentObject(localizationManager)
                                 .onAppear {
                                     // Load more when reaching near the end
                                     if system.id == viewModel.filteredSystems.last?.id {
@@ -177,8 +182,10 @@ struct SystemsView: View {
                 .refreshable {
                     isRefreshing = true
                     // Check if organization changed and refresh if needed
-                    await viewModel.checkAndRefreshIfOrganizationChanged()
-                    await viewModel.refreshSystems()
+                    let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                    if !organizationChanged {
+                        await viewModel.refreshSystems()
+                    }
                     isRefreshing = false
                 }
             }

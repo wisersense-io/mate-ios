@@ -197,3 +197,19 @@
 "old_password_placeholder" = "Eski şifrenizi girin";
 "new_password_placeholder" = "Yeni şifrenizi girin";
 "confirm_password_placeholder" = "Yeni şifrenizi tekrar girin";
+
+/* Alarm Types */
+"key_all_alarms" = "Tüm Alarmlar";
+"key_temperature_alarm" = "Sıcaklık";
+"key_vibrationRms" = "Titreşim RMS";
+"key_vibrationVRms" = "Titreşim VRMS";
+"key_vibrationCf" = "Titreşim CF";
+"key_acousticRms" = "Akustik RMS";
+"key_acousticCf" = "Akustik CF";
+"key_magneticRms" = "Manyetik RMS";
+"key_magneticCf" = "Manyetik CF";
+"key_proximityp2p" = "Yakınlık P2P";
+
+/* Alarm Filters */
+"key_active_alarms" = "Aktif Alarmlar";
+"key_passive_alarms" = "Pasif Alarmlar";

@@ -37,14 +37,9 @@ class DateFilterManager: ObservableObject {
         return availableFilters.first { $0.dateType == dateType }
     }
     
-    /// Check if date type requires weekly resolution (1 aylık'tan fazla)
+    /// Check if date type requires weekly resolution (React Native logic: dateType.rawValue > 3)
     static func shouldUseWeeklyResolution(for dateType: DashboardDateType) -> Bool {
-        switch dateType {
-        case .last90Days, .last3Months, .last6Months:
-            return true
-        default:
-            return false
-        }
+        return dateType.rawValue > 3
     }
     
     /// Get appropriate resolution type for date filter
@@ -69,7 +64,7 @@ class DateFilterManager: ObservableObject {
     // MARK: - Default Filters for Different Screens
     
     /// Default filter for Dashboard screen
-    static let defaultDashboardFilter: DashboardDateType = .thisWeek
+    static let defaultDashboardFilter: DashboardDateType = .last7Days
     
     /// Default filter for System Detail screen
     static let defaultSystemDetailFilter: DashboardDateType = .last7Days

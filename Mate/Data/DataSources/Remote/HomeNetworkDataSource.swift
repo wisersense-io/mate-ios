@@ -24,21 +24,15 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchDashboardInfo(organizationId: String) async throws -> HomeDashboardInfoResponseDTO {
-        print("🔍 Starting fetchDashboardInfo for organizationId: \(organizationId)")
-        
         // Check if user is logged in
         let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        print("👤 User logged in: \(isLoggedIn)")
         
         // Check current token
         if let token = DIContainer.shared.getCurrentToken() {
-            print("🔑 Token exists: \(token.accessToken.prefix(20))...")
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
         }
-        
-        print("🏢 Using Organization ID: \(organizationId)")
         
         // Create URL with organization ID
         let urlString = "\(baseURL)/dashboard/mobile/totalcounts/\(organizationId)"
@@ -50,10 +44,6 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
         // Create authorized request
         let request = createAuthorizedRequest(url: url)
         
-        print("🚀 Making API Request:")
-        print("URL: \(url.absoluteString)")
-        print("Headers: \(request.allHTTPHeaderFields ?? [:])")
-        
         do {
             let (data, response) = try await urlSession.data(for: request)
             
@@ -61,10 +51,6 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 print("❌ Could not cast response to HTTPURLResponse")
                 throw APIError.networkError
             }
-            
-            print("📊 HTTP Response:")
-            print("Status Code: \(httpResponse.statusCode)")
-            print("Headers: \(httpResponse.allHeaderFields)")
             
             // Check for HTTP errors
             guard (200...299).contains(httpResponse.statusCode) else {
@@ -74,21 +60,10 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 }
                 throw APIError.networkError
             }
-            
-            // Print raw JSON response for debugging
-            /*if let jsonString = String(data: data, encoding: .utf8) {
-                print("📡 API Response JSON:")
-                print(jsonString)
-            } else {
-                print("❌ Could not convert data to string")
-                print("📊 Raw Data: \(data)")
-            }
-            */
-            
+
             // Decode response
             let decoder = JSONDecoder()
             let responseDTO = try decoder.decode(HomeDashboardInfoResponseDTO.self, from: data)
-            print("✅ Data decoded successfully: \(responseDTO)")
             return responseDTO
             
         } catch let decodingError as DecodingError {
@@ -147,15 +122,11 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchHealthScore(organizationId: String, isWeighted: Bool) async throws -> HealthScoreResponseDTO {
-        print("🔍 Starting fetchHealthScore for organizationId: \(organizationId), isWeighted: \(isWeighted)")
-        
         // Check if user is logged in
         let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        print("👤 User logged in: \(isLoggedIn)")
         
         // Check current token
         if let token = DIContainer.shared.getCurrentToken() {
-            print("🔑 Token exists: \(token.accessToken.prefix(20))...")
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
@@ -171,10 +142,6 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
         // Create authorized request
         let request = createAuthorizedRequest(url: url)
         
-        print("🚀 Making Health Score API Request:")
-        print("URL: \(url.absoluteString)")
-        print("Headers: \(request.allHTTPHeaderFields ?? [:])")
-        
         do {
             let (data, response) = try await urlSession.data(for: request)
             
@@ -182,10 +149,6 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 print("❌ Could not cast response to HTTPURLResponse")
                 throw APIError.networkError
             }
-            
-            print("📊 HTTP Response:")
-            print("Status Code: \(httpResponse.statusCode)")
-            print("Headers: \(httpResponse.allHeaderFields)")
             
             // Check for HTTP errors
             guard (200...299).contains(httpResponse.statusCode) else {
@@ -196,16 +159,10 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 throw APIError.networkError
             }
             
-            // Print raw JSON response for debugging
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("📡 Health Score API Response JSON:")
-                print(jsonString)
-            }
             
             // Decode response
             let decoder = JSONDecoder()
             let responseDTO = try decoder.decode(HealthScoreResponseDTO.self, from: data)
-            print("✅ Health Score data decoded successfully: \(responseDTO)")
             return responseDTO
             
         } catch let decodingError as DecodingError {
@@ -262,15 +219,11 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
     }
     
     func fetchHealthScoreTrend(organizationId: String, dateType: DateType = .last7Days, resolutionType: DateResolutionType = .daily) async throws -> HealthScoreTrendResponseDTO {
-        print("🔍 Starting fetchHealthScoreTrend for organizationId: \(organizationId), dateType: \(dateType.rawValue), resolutionType: \(resolutionType.rawValue)")
-        
         // Check if user is logged in
         let isLoggedIn = DIContainer.shared.isUserLoggedIn()
-        print("👤 User logged in: \(isLoggedIn)")
         
         // Check current token
         if let token = DIContainer.shared.getCurrentToken() {
-            print("🔑 Token exists: \(token.accessToken.prefix(20))...")
         } else {
             print("❌ No token found!")
             throw APIError.invalidResponse("No authentication token found")
@@ -279,21 +232,13 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
         // Create URL with query parameters
         let urlString = "\(baseURL)/dashboard/system/healthscore/organization/trend/\(organizationId)/\(dateType.rawValue)/\(resolutionType.rawValue)"
         
-        //let urlString = "\(baseURL)/dashboard/healthscore/organization/\(organizationId)/\(isWeighted)"
-        
-        
         // Create authorized request
-        
         guard let url = URL(string: urlString) else {
             print("❌ Invalid URL: \(urlString)")
             throw APIError.invalidResponse("Invalid URL")
         }
         
         let request = createAuthorizedRequest(url: url)
-        
-        print("🚀 Making Health Score Trend API Request:")
-        print("URL: \(url.absoluteString)")
-        print("Headers: \(request.allHTTPHeaderFields ?? [:])")
         
         do {
             let (data, response) = try await urlSession.data(for: request)
@@ -302,10 +247,6 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 print("❌ Could not cast response to HTTPURLResponse")
                 throw APIError.networkError
             }
-            
-            print("📊 HTTP Response:")
-            print("Status Code: \(httpResponse.statusCode)")
-            print("Headers: \(httpResponse.allHeaderFields)")
             
             // Check for HTTP errors
             guard (200...299).contains(httpResponse.statusCode) else {
@@ -316,16 +257,9 @@ class HomeNetworkDataSource: HomeNetworkDataSourceProtocol {
                 throw APIError.networkError
             }
             
-            // Print raw JSON response for debugging
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("📡 Health Score Trend API Response JSON:")
-                print(jsonString)
-            }
-            
             // Decode response
             let decoder = JSONDecoder()
             let responseDTO = try decoder.decode(HealthScoreTrendResponseDTO.self, from: data)
-            print("✅ Health Score Trend data decoded successfully: \(responseDTO)")
             return responseDTO
             
         } catch let decodingError as DecodingError {

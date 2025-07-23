@@ -5,7 +5,10 @@ struct SystemCard: View {
     let isAlive: Bool
     let isDeviceConnected: Bool
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var navigateToSystemDetail = false
+    @State private var navigateToHistory = false
+    @State private var selectedHistoryTab: HistoryTab = .alarms
     
     // Default initializer for backward compatibility
     init(system: System, isAlive: Bool = false, isDeviceConnected: Bool = false) {
@@ -54,17 +57,29 @@ struct SystemCard: View {
             HStack {
                 // Left side - Alarm and Diagnosis icons
                 HStack(spacing: 8) {
-                    // Alarm indicator
-                    Image(systemName: "bell")
-                        .font(.system(size: 16))
-                        .foregroundColor(system.hasAlarm ? .red : themeManager.currentColors.mainTextColor.opacity(0.3))
+                    // Alarm indicator (clickable)
+                    Button(action: {
+                        selectedHistoryTab = .alarms
+                        navigateToHistory = true
+                    }) {
+                        Image(systemName: "bell")
+                            .font(.system(size: 16))
+                            .foregroundColor(system.hasAlarm ? .red : themeManager.currentColors.mainTextColor.opacity(0.3))
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     
-                    // Diagnosis indicator
-                    Image(systemName: "stethoscope")
-                        .font(.system(size: 16))
-                        .foregroundColor(system.hasDiagnosis ?  themeManager.currentColors.mainAccentColor : themeManager.currentColors.mainTextColor.opacity(0.3))
+                    // Diagnosis indicator (clickable)
+                    Button(action: {
+                        selectedHistoryTab = .diagnoses
+                        navigateToHistory = true
+                    }) {
+                        Image(systemName: "stethoscope")
+                            .font(.system(size: 16))
+                            .foregroundColor(system.hasDiagnosis ? themeManager.currentColors.mainAccentColor : themeManager.currentColors.mainTextColor.opacity(0.3))
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     
-                    // Alive indicator (running state)
+                    // Alive indicator (running state - not clickable)
                     Image(systemName: "power")
                         .font(.system(size: 16))
                         .foregroundColor(isAlive ? Color.green : themeManager.currentColors.mainTextColor.opacity(0.3))
@@ -93,6 +108,17 @@ struct SystemCard: View {
                 isDeviceConnected: isDeviceConnected
             )
             .environmentObject(themeManager)
+            .environmentObject(localizationManager)
+        }
+        .fullScreenCover(isPresented: $navigateToHistory) {
+            SystemHistoryView(
+                system: system,
+                isAlive: isAlive,
+                isDeviceConnected: isDeviceConnected,
+                initialTab: selectedHistoryTab
+            )
+            .environmentObject(themeManager)
+            .environmentObject(localizationManager)
         }
     }
 }

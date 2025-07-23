@@ -27,6 +27,9 @@ class DashboardViewModel: ObservableObject {
     private let organizationUseCase: OrganizationUseCaseProtocol
     private var lastUsedOrganizationId: String?
     
+    // MARK: - Task Management
+    private var currentTask: Task<Void, Never>?
+    
     // MARK: - Initialization
     init(dashboardUseCase: DashboardUseCaseProtocol, 
          organizationUseCase: OrganizationUseCaseProtocol = DIContainer.shared.makeOrganizationUseCase()) {
@@ -34,13 +37,32 @@ class DashboardViewModel: ObservableObject {
         self.organizationUseCase = organizationUseCase
     }
     
+    deinit {
+        currentTask?.cancel()
+    }
+    
     // MARK: - Public Methods
     func loadChartData() async {
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: Chart data loading cancelled")
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         
         do {
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
+            }
+            
             let dashboardChartData = try await dashboardUseCase.getChartDistribution(dateType: selectedDateFilter)
+            
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
+            }
             
             // Convert to DonutChartData
             let donutChartData = dashboardChartData.map { $0.toDonutChartData() }
@@ -49,6 +71,11 @@ class DashboardViewModel: ObservableObject {
             print("✅ DashboardViewModel: Successfully loaded \(donutChartData.count) charts")
             
         } catch {
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
+            }
+            
             self.errorMessage = error.localizedDescription
             print("❌ DashboardViewModel: Error loading chart data: \(error)")
         }
@@ -57,10 +84,43 @@ class DashboardViewModel: ObservableObject {
     }
     
     func refreshData() async {
-        // Load all chart data in parallel
-        async let _ = loadChartData()
-        async let _ = loadSystemAlarmTrend()
-        async let _ = loadSystemHealthScoreTrend()
+        // Cancel any existing task
+        currentTask?.cancel()
+        
+        // Create new task
+        currentTask = Task {
+            await performDataRefresh()
+        }
+        
+        await currentTask?.value
+    }
+    
+    private func performDataRefresh() async {
+        // Check if task is cancelled
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: Data refresh cancelled")
+            return
+        }
+        
+        // Load chart data sequentially to avoid race conditions
+        await loadChartData()
+        
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: Data refresh cancelled after chart data")
+            return
+        }
+        
+        await loadSystemAlarmTrend()
+        
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: Data refresh cancelled after alarm trend")
+            return
+        }
+        
+        await loadSystemHealthScoreTrend()
+        
+        print("✅ DashboardViewModel: All data refreshed successfully")
+        currentTask = nil
     }
     
     func updateDateFilter(_ dateType: DashboardDateType) async {
@@ -76,10 +136,20 @@ class DashboardViewModel: ObservableObject {
     }
     
     func loadSystemAlarmTrend() async {
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: System alarm trend loading cancelled")
+            return
+        }
+        
         isSystemAlarmTrendLoading = true
         systemAlarmTrendError = nil
         
         do {
+            guard !Task.isCancelled else {
+                isSystemAlarmTrendLoading = false
+                return
+            }
+            
             // 15 günden fazla veri istediğinde haftalık çözünürlük kullan
             let resolutionType: DashboardDateResolutionType = selectedDateFilter.rawValue >= 4 ? .weekly : .daily
             
@@ -88,10 +158,20 @@ class DashboardViewModel: ObservableObject {
                 resolutionType: resolutionType
             )
             
+            guard !Task.isCancelled else {
+                isSystemAlarmTrendLoading = false
+                return
+            }
+            
             self.systemAlarmTrendData = trendData
             print("✅ DashboardViewModel: Successfully loaded system alarm trend with \(resolutionType) resolution")
             
         } catch {
+            guard !Task.isCancelled else {
+                isSystemAlarmTrendLoading = false
+                return
+            }
+            
             self.systemAlarmTrendError = error.localizedDescription
             print("❌ DashboardViewModel: Error loading system alarm trend: \(error)")
         }
@@ -104,10 +184,20 @@ class DashboardViewModel: ObservableObject {
     }
     
     func loadSystemHealthScoreTrend() async {
+        guard !Task.isCancelled else {
+            print("🚫 DashboardViewModel: System health score trend loading cancelled")
+            return
+        }
+        
         isSystemHealthScoreTrendLoading = true
         systemHealthScoreTrendError = nil
         
         do {
+            guard !Task.isCancelled else {
+                isSystemHealthScoreTrendLoading = false
+                return
+            }
+            
             // 15 günden fazla veri istediğinde haftalık çözünürlük kullan
             let resolutionType: DashboardDateResolutionType = selectedDateFilter.rawValue >= 4 ? .weekly : .daily
             
@@ -116,10 +206,20 @@ class DashboardViewModel: ObservableObject {
                 resolutionType: resolutionType
             )
             
+            guard !Task.isCancelled else {
+                isSystemHealthScoreTrendLoading = false
+                return
+            }
+            
             self.systemHealthScoreTrendData = trendData
             print("✅ DashboardViewModel: Successfully loaded system health score trend with \(resolutionType) resolution")
             
         } catch {
+            guard !Task.isCancelled else {
+                isSystemHealthScoreTrendLoading = false
+                return
+            }
+            
             self.systemHealthScoreTrendError = error.localizedDescription
             print("❌ DashboardViewModel: Error loading system health score trend: \(error)")
         }
@@ -133,7 +233,7 @@ class DashboardViewModel: ObservableObject {
     
     // MARK: - Organization Management
     
-    func checkAndRefreshIfOrganizationChanged() async {
+    func checkAndRefreshIfOrganizationChanged() async -> Bool {
         let currentOrganizationId = organizationUseCase.getActiveOrganization()
         
         if currentOrganizationId != lastUsedOrganizationId {
@@ -142,6 +242,8 @@ class DashboardViewModel: ObservableObject {
             
             // Refresh all data when organization changes
             await refreshData()
+            return true // Data was refreshed
         }
+        return false // No refresh needed
     }
 } 

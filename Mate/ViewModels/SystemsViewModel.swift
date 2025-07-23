@@ -197,11 +197,13 @@ class SystemsViewModel: ObservableObject {
     
     // MARK: - Organization Change Detection
     
-    func checkAndRefreshIfOrganizationChanged() async {
+    func checkAndRefreshIfOrganizationChanged() async -> Bool {
         if let newOrganizationId = getOrganizationId(),
            newOrganizationId != currentOrganizationId {
             await loadSystems()
+            return true // Data was refreshed
         }
+        return false // No refresh needed
     }
     
     func getSystemsCount() -> Int {

@@ -99,7 +99,7 @@
 
 /* Health Score Trend */
 "loading_trend_data" = "Loading Trend Data...";
-"weekly_trend" = "Health Score Trend";
+"health_score_trend" = "Health Score Trend";
 "no_data_available" = "No Data Available";
 "scroll_to_see_more" = "Scroll to see more";
 
@@ -205,3 +205,19 @@
 "old_password_placeholder" = "Enter your old password";
 "new_password_placeholder" = "Enter your new password";
 "confirm_password_placeholder" = "Confirm your new password";
+
+/* Alarm Types */
+"key_all_alarms" = "All Alarms";
+"key_temperature_alarm" = "Temperature";
+"key_vibrationRms" = "Vibration RMS";
+"key_vibrationVRms" = "Vibration VRMS";
+"key_vibrationCf" = "Vibration CF";
+"key_acousticRms" = "Acoustic RMS";
+"key_acousticCf" = "Acoustic CF";
+"key_magneticRms" = "Magnetic RMS";
+"key_magneticCf" = "Magnetic CF";
+"key_proximityp2p" = "Proximity P2P";
+
+/* Alarm Filters */
+"key_active_alarms" = "Active Alarms";
+"key_passive_alarms" = "Passive Alarms";

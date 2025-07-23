@@ -34,8 +34,10 @@ struct DashboardView: View {
                             
                             Button("Tekrar Dene") {
                                 Task {
-                                    await viewModel.checkAndRefreshIfOrganizationChanged()
-                                    await viewModel.refreshData()
+                                    let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                    if !organizationChanged {
+                                        await viewModel.refreshData()
+                                    }
                                 }
                             }
                             .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -73,8 +75,10 @@ struct DashboardView: View {
                                 
                                 Button("Tekrar Dene") {
                                     Task {
-                                        await viewModel.checkAndRefreshIfOrganizationChanged()
-                                        await viewModel.refreshSystemAlarmTrend()
+                                        let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                        if !organizationChanged {
+                                            await viewModel.refreshSystemAlarmTrend()
+                                        }
                                     }
                                 }
                                 .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -108,8 +112,10 @@ struct DashboardView: View {
                                 
                                 Button("Tekrar Dene") {
                                     Task {
-                                        await viewModel.checkAndRefreshIfOrganizationChanged()
-                                        await viewModel.refreshSystemHealthScoreTrend()
+                                        let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                        if !organizationChanged {
+                                            await viewModel.refreshSystemHealthScoreTrend()
+                                        }
                                     }
                                 }
                                 .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -142,8 +148,10 @@ struct DashboardView: View {
                         ForEach(viewModel.availableFilters, id: \.dateType) { filter in
                             Button(action: {
                                 Task {
-                                    await viewModel.checkAndRefreshIfOrganizationChanged()
-                                    await viewModel.updateDateFilter(filter.dateType)
+                                    let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                                    if !organizationChanged {
+                                        await viewModel.updateDateFilter(filter.dateType)
+                                    }
                                 }
                             }) {
                                 HStack {
@@ -179,17 +187,13 @@ struct DashboardView: View {
                 print("📱 DashboardView: Initial task triggered")
                 
                 // Check if organization changed and refresh if needed
-                await viewModel.checkAndRefreshIfOrganizationChanged()
+                let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
                 
-                await viewModel.refreshData()
+                // Only refresh data if organization didn't change (to avoid race condition)
+                if !organizationChanged {
+                    await viewModel.refreshData()
+                }
             }
         }
     }
-}
-
-
-
-#Preview {
-    DashboardView()
-        .environmentObject(ThemeManager.shared)
 }

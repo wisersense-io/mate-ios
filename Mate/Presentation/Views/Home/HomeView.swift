@@ -110,24 +110,30 @@ struct HomeView: View {
                 print("🔄 HomeView: Pull-to-refresh triggered")
                 
                 // Check if organization changed and refresh if needed
-                await homeViewModel.checkAndRefreshIfOrganizationChanged()
+                let organizationChanged = await homeViewModel.checkAndRefreshIfOrganizationChanged()
                 
-                // Load dashboard data, health score, and trend data in parallel
-                async let _ = homeViewModel.loadDashboardData()
-                async let _ = homeViewModel.loadHealthScore()
-                async let _ = homeViewModel.loadHealthScoreTrend()
+                // Only refresh if organization didn't change (to avoid race condition)
+                if !organizationChanged {
+                    // Load dashboard data, health score, and trend data sequentially
+                    await homeViewModel.loadDashboardData()
+                    await homeViewModel.loadHealthScore()
+                    await homeViewModel.loadHealthScoreTrend()
+                }
             }
         }
         .task {
             print("📱 HomeView: Initial task triggered")
             
             // Check if organization changed and refresh if needed
-            await homeViewModel.checkAndRefreshIfOrganizationChanged()
+            let organizationChanged = await homeViewModel.checkAndRefreshIfOrganizationChanged()
             
-            // Load dashboard data, health score, and trend data in parallel on first load
-            async let _ = homeViewModel.loadDashboardData()
-            async let _ = homeViewModel.loadHealthScore()
-            async let _ = homeViewModel.loadHealthScoreTrend()
+            // Only load data if organization didn't change (to avoid race condition)
+            if !organizationChanged {
+                // Load dashboard data, health score, and trend data sequentially on first load
+                await homeViewModel.loadDashboardData()
+                await homeViewModel.loadHealthScore()
+                await homeViewModel.loadHealthScoreTrend()
+            }
         }
     }
     

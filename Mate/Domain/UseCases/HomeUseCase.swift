@@ -23,8 +23,6 @@ class HomeUseCase: HomeUseCaseProtocol {
             throw APIError.invalidResponse("Organization ID not found. Please select an organization.")
         }
         
-        print("🏠 HomeUseCase: Getting dashboard info for organizationId: \(organizationId)")
-        
         return try await homeRepository.fetchDashboardInfo(organizationId: organizationId)
     }
     
@@ -36,8 +34,6 @@ class HomeUseCase: HomeUseCaseProtocol {
         
         // Set isWeighted to false as requested
         let isWeighted = false
-        
-        print("🎯 HomeUseCase: Getting health score for organizationId: \(organizationId), isWeighted: \(isWeighted)")
         
         return try await homeRepository.fetchHealthScore(organizationId: organizationId, isWeighted: isWeighted)
     }
@@ -51,8 +47,6 @@ class HomeUseCase: HomeUseCaseProtocol {
         // Set default values as requested: Last7Days and Daily
         let dateType: DateType = .last7Days
         let resolutionType: DateResolutionType = .daily
-        
-        print("📈 HomeUseCase: Getting health score trend for organizationId: \(organizationId), dateType: \(dateType), resolutionType: \(resolutionType)")
         
         return try await homeRepository.fetchHealthScoreTrend(organizationId: organizationId, dateType: dateType, resolutionType: resolutionType)
     }
