@@ -66,17 +66,13 @@ class SystemDetailViewModel: ObservableObject {
     
     // MARK: - Organization Management
     
-    private func getOrganizationId() async -> String? {
-        do {
-            let selectedOrganization = try await organizationUseCase.getSelectedOrganization()
-            return selectedOrganization
-        } catch {
-            return nil
-        }
+    private func getOrganizationId() -> String? {
+        // organizationUseCase.getSelectedOrganization() is synchronous
+        return organizationUseCase.getSelectedOrganization()
     }
     
     func checkAndRefreshIfOrganizationChanged() async {
-        if let newOrganizationId = await getOrganizationId(),
+        if let newOrganizationId = getOrganizationId(),
            newOrganizationId != currentOrganizationId {
             currentOrganizationId = newOrganizationId
             await loadHealthScoreTrend()

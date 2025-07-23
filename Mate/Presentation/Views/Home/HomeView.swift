@@ -113,13 +113,9 @@ struct HomeView: View {
                 await homeViewModel.checkAndRefreshIfOrganizationChanged()
                 
                 // Load dashboard data, health score, and trend data in parallel
-                async let dashboardTask = homeViewModel.loadDashboardData()
-                async let healthScoreTask = homeViewModel.loadHealthScore()
-                async let trendTask = homeViewModel.loadHealthScoreTrend()
-                
-                await dashboardTask
-                await healthScoreTask
-                await trendTask
+                async let _ = homeViewModel.loadDashboardData()
+                async let _ = homeViewModel.loadHealthScore()
+                async let _ = homeViewModel.loadHealthScoreTrend()
             }
         }
         .task {
@@ -129,13 +125,9 @@ struct HomeView: View {
             await homeViewModel.checkAndRefreshIfOrganizationChanged()
             
             // Load dashboard data, health score, and trend data in parallel on first load
-            async let dashboardTask = homeViewModel.loadDashboardData()
-            async let healthScoreTask = homeViewModel.loadHealthScore()
-            async let trendTask = homeViewModel.loadHealthScoreTrend()
-            
-            await dashboardTask
-            await healthScoreTask
-            await trendTask
+            async let _ = homeViewModel.loadDashboardData()
+            async let _ = homeViewModel.loadHealthScore()
+            async let _ = homeViewModel.loadHealthScoreTrend()
         }
     }
     

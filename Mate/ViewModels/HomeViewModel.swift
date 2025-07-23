@@ -263,12 +263,8 @@ class HomeViewModel: ObservableObject {
         print("🔄 HomeViewModel: Refreshing all data due to organization change")
         
         // Load all data in parallel
-        async let dashboardTask = loadDashboardData()
-        async let healthScoreTask = loadHealthScore()
-        async let trendTask = loadHealthScoreTrend()
-        
-        await dashboardTask
-        await healthScoreTask
-        await trendTask
+        async let _ = loadDashboardData()
+        async let _ = loadHealthScore()
+        async let _ = loadHealthScoreTrend()
     }
 } 

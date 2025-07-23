@@ -27,10 +27,10 @@ class SystemsViewModel: ObservableObject {
     private var currentPage = 0
     private var currentOrganizationId: String?
     
-    init(systemUseCase: SystemUseCase, organizationUseCase: OrganizationUseCaseProtocol, signalRManager: SignalRManagerProtocol = SignalRManager.shared) {
+    init(systemUseCase: SystemUseCase, organizationUseCase: OrganizationUseCaseProtocol, signalRManager: SignalRManagerProtocol? = nil) {
         self.systemUseCase = systemUseCase
         self.organizationUseCase = organizationUseCase
-        self.signalRManager = signalRManager
+        self.signalRManager = signalRManager ?? SignalRManager.shared
         
         setupSignalRObservation()
     }
@@ -44,7 +44,7 @@ class SystemsViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            guard let organizationId = await getOrganizationId() else {
+            guard let organizationId = getOrganizationId() else {
                 errorMessage = "Organization not found"
                 isLoading = false
                 return
@@ -190,23 +190,17 @@ class SystemsViewModel: ObservableObject {
     
     // MARK: - Organization Management
     
-    private func getOrganizationId() async -> String? {
-        do {
-            let selectedOrganization = try await organizationUseCase.getSelectedOrganization()
-            return selectedOrganization
-        } catch {
-            return nil
-        }
+    private func getOrganizationId() -> String? {
+        // organizationUseCase.getSelectedOrganization() is synchronous and non-throwing
+        return organizationUseCase.getSelectedOrganization()
     }
     
     // MARK: - Organization Change Detection
     
-    func checkAndRefreshIfOrganizationChanged() {
-        Task {
-            if let newOrganizationId = await getOrganizationId(),
-               newOrganizationId != currentOrganizationId {
-                await loadSystems()
-            }
+    func checkAndRefreshIfOrganizationChanged() async {
+        if let newOrganizationId = getOrganizationId(),
+           newOrganizationId != currentOrganizationId {
+            await loadSystems()
         }
     }
     

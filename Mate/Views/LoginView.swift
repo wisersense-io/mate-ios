@@ -3,7 +3,7 @@ import SwiftUI
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
-    @FocusState private var focusedFiel: Field?
+    @FocusState private var focusedField: Field?
     @State private var isShowingResetSheet = false
     @State private var rememberMe = false
     
@@ -46,9 +46,9 @@ struct LoginView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
                     )
-                    .focused($focusedFiel, equals: .email)
+                    .focused($focusedField, equals: .email)
                     .onSubmit {
-                        focusedFiel = .password
+                        focusedField = .password
                     }
                 
                 SecureField("password_placeholder".localized(language: localizationManager.currentLanguage), text: $viewModel.password)
@@ -62,9 +62,9 @@ struct LoginView: View {
                             .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
                     )
                     .submitLabel(.done)
-                    .focused($focusedFiel, equals: .password)
+                    .focused($focusedField, equals: .password)
                     .onSubmit {
-                        focusedFiel = nil
+                        focusedField = nil
                     }
                 
                 
@@ -108,8 +108,8 @@ struct LoginView: View {
             }
             .padding(.horizontal)
             .disabled(viewModel.isLoading)
-            .onChange(of: viewModel.isLoginSuccessful) { success in
-                if success {
+            .onChange(of: viewModel.isLoginSuccessful) {
+                if viewModel.isLoginSuccessful {
                     NotificationCenter.default.post(name: .userDidLogin, object: nil)
                     viewModel.resetLoginState()
                 }

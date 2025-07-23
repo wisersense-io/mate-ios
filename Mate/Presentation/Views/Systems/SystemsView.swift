@@ -11,8 +11,7 @@ struct SystemsView: View {
         let container = DIContainer.shared
         self._viewModel = StateObject(wrappedValue: SystemsViewModel(
             systemUseCase: container.systemUseCaseInstance,
-            organizationUseCase: container.organizationUseCaseInstance,
-            signalRManager: SignalRManager.shared
+            organizationUseCase: container.organizationUseCaseInstance
         ))
     }
     
@@ -236,7 +235,3 @@ struct EmptyStateView: View {
         .padding()
     }
 }
-
-#Preview {
-    SystemsView()
-} 

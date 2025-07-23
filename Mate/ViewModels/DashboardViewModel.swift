@@ -58,13 +58,9 @@ class DashboardViewModel: ObservableObject {
     
     func refreshData() async {
         // Load all chart data in parallel
-        async let chartTask = loadChartData()
-        async let alarmTrendTask = loadSystemAlarmTrend()
-        async let healthScoreTrendTask = loadSystemHealthScoreTrend()
-        
-        await chartTask
-        await alarmTrendTask
-        await healthScoreTrendTask
+        async let _ = loadChartData()
+        async let _ = loadSystemAlarmTrend()
+        async let _ = loadSystemHealthScoreTrend()
     }
     
     func updateDateFilter(_ dateType: DashboardDateType) async {
@@ -72,14 +68,7 @@ class DashboardViewModel: ObservableObject {
         
         selectedDateFilter = dateType
         
-        // Load all chart data in parallel
-        async let chartTask = loadChartData()
-        async let alarmTrendTask = loadSystemAlarmTrend()
-        async let healthScoreTrendTask = loadSystemHealthScoreTrend()
-        
-        await chartTask
-        await alarmTrendTask
-        await healthScoreTrendTask
+        await refreshData()
     }
     
     func getLocalizedFilterTitle(_ dateType: DashboardDateType) -> String {
