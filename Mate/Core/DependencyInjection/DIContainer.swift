@@ -40,6 +40,10 @@ class DIContainer: ObservableObject {
         SystemNetworkDataSource(tokenStorage: tokenStorageService)
     }()
     
+    private lazy var systemHistoryNetworkDataSource: SystemHistoryNetworkDataSourceProtocol = {
+        SystemHistoryNetworkDataSource(tokenStorage: tokenStorageService)
+    }()
+    
     // MARK: - Repositories
     private lazy var authRepository: AuthRepositoryProtocol = {
         AuthRepository(
@@ -68,6 +72,10 @@ class DIContainer: ObservableObject {
     
     private lazy var systemRepository: SystemRepositoryProtocol = {
         SystemRepository(networkDataSource: systemNetworkDataSource)
+    }()
+    
+    private lazy var systemHistoryRepository: SystemHistoryRepositoryProtocol = {
+        SystemHistoryRepository(networkDataSource: systemHistoryNetworkDataSource)
     }()
     
     // MARK: - Use Cases
@@ -101,6 +109,12 @@ class DIContainer: ObservableObject {
     
     lazy var systemUseCase: SystemUseCase = {
         SystemUseCase(systemRepository: systemRepository)
+    }()
+    
+    private lazy var systemHistoryUseCase: SystemHistoryUseCaseProtocol = {
+        SystemHistoryUseCase(
+            repository: systemHistoryRepository
+        )
     }()
     
     // MARK: - User Session
@@ -141,6 +155,10 @@ class DIContainer: ObservableObject {
     
     var systemUseCaseInstance: SystemUseCase {
         return systemUseCase
+    }
+    
+    var systemHistoryUseCaseInstance: SystemHistoryUseCaseProtocol {
+        return systemHistoryUseCase
     }
     
     var userSessionManagerInstance: UserSessionManager {

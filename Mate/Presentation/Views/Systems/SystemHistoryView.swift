@@ -36,7 +36,7 @@ struct SystemHistoryView: View {
         let container = DIContainer.shared
         self._viewModel = StateObject(wrappedValue: SystemHistoryViewModel(
             system: system,
-            organizationUseCase: container.organizationUseCaseInstance
+            systemHistoryUseCase: container.systemHistoryUseCaseInstance
         ))
     }
     
@@ -242,29 +242,10 @@ struct SystemHistoryView: View {
          }
         .task {
             print("📱 SystemHistoryView: Initial task triggered")
-            
-            // Check if organization changed and refresh if needed
-            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
-            
-            // Only load initial data if organization didn't change (to avoid race condition)
-            if !organizationChanged {
-                if selectedTab == .alarms {
-                    await viewModel.loadAlarmHistory()
-                } else {
-                    await viewModel.loadDiagnosisHistory()
-                }
-            }
-        }
-        .refreshable {
-            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
-            
-            // Only refresh if organization didn't change (to avoid race condition)
-            if !organizationChanged {
-                if selectedTab == .alarms {
-                    await viewModel.refreshAlarmHistory()
-                } else {
-                    await viewModel.refreshDiagnosisHistory()
-                }
+            if selectedTab == .alarms {
+                await viewModel.loadAlarmHistory()
+            } else {
+                await viewModel.loadDiagnosisHistory()
             }
         }
     }
@@ -274,7 +255,7 @@ struct SystemHistoryView: View {
     // MARK: - Content Views
     
     private var alarmsContent: some View {
-        Group {
+        VStack {
             if viewModel.isAlarmsLoading {
                 ProgressView("Loading alarms...")
                     .frame(height: 100)
@@ -292,10 +273,7 @@ struct SystemHistoryView: View {
                     
                     Button("Tekrar Dene") {
                         Task {
-                            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
-                            if !organizationChanged {
-                                await viewModel.refreshAlarmHistory()
-                            }
+                            await viewModel.refreshAlarmHistory()
                         }
                     }
                     .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -305,11 +283,11 @@ struct SystemHistoryView: View {
             } else {
                 ForEach(viewModel.alarmData) { alarm in
                     AlarmHistoryCard(
-                        title: alarm.title,
-                        expert: alarm.expert,
-                        startDate: alarm.startDate,
-                        asset: alarm.asset,
-                        point: alarm.point
+                        title: alarm.displayTitle,
+                        expert: alarm.expertName,
+                        startDate: alarm.formattedStartDate,
+                        asset: alarm.assetName,
+                        point: alarm.pointName
                     )
                     .environmentObject(themeManager)
                 }
@@ -333,7 +311,7 @@ struct SystemHistoryView: View {
     }
     
     private var diagnosesContent: some View {
-        Group {
+        VStack {
             if viewModel.isDiagnosisLoading {
                 ProgressView("Loading diagnoses...")
                     .frame(height: 100)
@@ -351,10 +329,7 @@ struct SystemHistoryView: View {
                     
                     Button("Tekrar Dene") {
                         Task {
-                            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
-                            if !organizationChanged {
-                                await viewModel.refreshDiagnosisHistory()
-                            }
+                            await viewModel.refreshDiagnosisHistory()
                         }
                     }
                     .foregroundColor(themeManager.currentColors.mainAccentColor)
@@ -364,11 +339,11 @@ struct SystemHistoryView: View {
             } else {
                 ForEach(viewModel.diagnosisData) { diagnosis in
                     DiagnosisHistoryCard(
-                        title: diagnosis.title,
-                        expert: diagnosis.expert,
-                        startDate: diagnosis.startDate,
-                        asset: diagnosis.asset,
-                        point: diagnosis.point
+                        title: diagnosis.displayTitle,
+                        expert: diagnosis.expertName,
+                        startDate: diagnosis.formattedStartDate,
+                        asset: diagnosis.assetName,
+                        point: diagnosis.pointName
                     )
                     .environmentObject(themeManager)
                 }
