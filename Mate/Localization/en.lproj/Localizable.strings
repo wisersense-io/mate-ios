@@ -1,0 +1,207 @@
+/* Login Screen */
+"login_title" = "Sign In";
+"email_placeholder" = "Email";
+"password_placeholder" = "Password";
+"remember_me" = "Remember Me";
+"forgot_password" = "Forgot Password";
+"sign_in" = "Sign In";
+"back" = "Back";
+
+/* Password Reset */
+"password_reset_title" = "Password Reset";
+"password_reset_message" = "Please enter your email address, we will send you a verification code.";
+"send_reset_code" = "Send Reset Link";
+
+/* Verification Code */
+"verification_code_title" = "Verification Code";
+"verification_code_message" = "Enter the 6-digit verification code sent to your email address.";
+"verification_code_placeholder" = "Verification Code";
+"verify" = "Verify";
+"success" = "Success";
+"verification_success_message" = "Verification successful, you are being redirected to the login screen.";
+"ok" = "OK";
+
+/* Error Messages */
+"invalid_email_password" = "Invalid email or password";
+"enter_valid_email" = "Please enter a valid email address";
+"login_failed" = "Login failed. Please check your credentials";
+"verification_code_error" = "Verification code is incorrect, please try again.";
+"invalid_url" = "Invalid request URL";
+"invalid_response" = "Unexpected server response";
+"unknown_error" = "Unknown error";
+"token_storage_error" = "Token storage error";
+"user_not_found" = "User not found or application access denied";
+"user_inactive" = "User account is inactive";
+"email_not_confirmed" = "Email address not confirmed";
+"password_temporary" = "Temporary password in use, please change it";
+"network_error" = "Network connection error";
+"unknown_error_code" = "Unknown error code";
+"token_not_found" = "Authentication token not found";
+"required_fields_missing" = "Required fields missing";
+"invalid_email_format" = "Invalid email format";
+"invalid_data_format" = "Invalid data format";
+"server_exception" = "Server internal error occurred";
+
+/* General */
+"loading" = "Loading...";
+"cancel" = "Cancel";
+"done" = "Done";
+"next" = "Next";
+"hello_world" = "Hello, world!";
+
+/* Language Selection */
+"select_language" = "Select Language";
+"language_changed" = "Language Changed";
+
+/* Tab Navigation */
+"dashboard" = "Dashboard";
+"projects" = "Projects";
+"organization" = "Organization";
+"systems" = "Systems";
+"profile" = "Profile";
+"home" = "Home";
+/* Home Dashboard */
+"device_count" = "Devices";
+"system_count" = "Systems";
+"asset_count" = "Assets";
+"devices_with_alarms" = "Alarmed Systems";
+"alarms_ratio" = "Alarm Ratio";
+
+/* Dashboard */
+"welcome_dashboard" = "Welcome";
+"dashboard_subtitle" = "What would you like to do today?";
+"active_projects" = "Active Projects";
+"total_tasks" = "Total Tasks";
+"pending_reviews" = "Pending Reviews";
+"team_members" = "Team Members";
+
+/* Coming Soon Views */
+"projects_coming_soon" = "Projects Coming Soon";
+"projects_description" = "Project management features will be added soon.";
+"analytics_coming_soon" = "Analytics Coming Soon";
+"analytics_description" = "Detailed analytics reports will be ready soon.";
+"messages_coming_soon" = "Messages Coming Soon";
+"messages_description" = "Team messaging features will be active soon.";
+
+/* Profile */
+"profile_title" = "Profile";
+"profile_logged_in" = "Logged in";
+"settings" = "Settings";
+"notifications" = "Notifications";
+"help" = "Help";
+"logout" = "Logout";
+"change_password_now" = "Change Now";
+
+/* Health Score */
+"health_score_title" = "Health Score";
+"loading_health_score" = "Loading Health Score...";
+"health_score_share_message" = "My Health Score: {score}/10 🎯\n\nI'm tracking my health status with the Mate app!";
+
+/* Health Score Trend */
+"loading_trend_data" = "Loading Trend Data...";
+"weekly_trend" = "Health Score Trend";
+"no_data_available" = "No Data Available";
+"scroll_to_see_more" = "Scroll to see more";
+
+/* Verification Code */
+"verification_code_title" = "Verification Code";
+"verification_code_message" = "Enter the 6-digit verification code sent to your email address.";
+"verification_code_placeholder" = "Verification Code";
+"verify" = "Verify";
+"success" = "Success";
+"verification_success_message" = "Verification successful, you are being redirected to the login screen.";
+"ok" = "OK";
+
+/* Dashboard Charts */
+"key_health_score_of_assets_distribution" = "Health Score Distribution of Assets";
+"key_health_score_of_systems_distributions" = "Health Score Distribution of Systems";
+"key_alarm_distributions_of_systems" = "Alarm Distribution of Systems";
+"key_health_score_trend_of_packets" = "Health Score Trend of Packets";
+"key_health_score_trend_of_systems" = "Health Score Trend of Systems";
+
+/* Date Filters */
+"key_this_week" = "This week";
+"key_last_7_days" = "Last 7 days";
+"key_last_week" = "Last week";
+"key_last_15_days" = "Last 15 days";
+"key_last_30_days" = "Last 30 days";
+"key_last_90_days" = "Last 90 days";
+"key_this_month" = "This month";
+"key_last_month" = "Last month";
+"key_last_3_month" = "Last 3 months";
+"key_last_6_month" = "Last 6 months";
+
+/* Health Score Segments */
+"keyNormal" = "Normal";
+"keyMonitored" = "Monitored";
+"keyWarning" = "Warning";
+"keyDanger" = "Danger";
+
+/* Alarm Type Segments */
+"key_temperature" = "Temperature";
+"key_max_rms" = "MaxRMS";
+"key_max_vrms" = "MaxVRMS";
+"key_max_cf" = "MaxCF";
+
+/* Organization Selector */
+"organization_selector" = "Organization Selector";
+"search_organizations" = "Search Organizations";
+"selected_organization" = "Selected Organization";
+"no_organizations_found" = "No organizations found";
+"loading_organizations" = "Loading organizations...";
+"error_loading_organizations" = "Error loading organizations";
+"expand" = "Expand";
+"collapse" = "Collapse";
+"select_organization" = "Select Organization";
+"organization_search_placeholder" = "Search organization...";
+"sub_units" = "sub units";
+
+/* Systems */
+"systems_count" = "Systems";
+"assets_count" = "Assets";
+"devices_count" = "Devices";
+"loading_systems" = "Loading systems...";
+"error_loading_systems" = "Error loading systems";
+"no_systems_found" = "No systems found";
+"retry" = "Retry";
+"key_all_systems" = "All systems";
+"key_systems_with_alarm" = "Systems with alarm";
+"key_systems_with_diagnosis" = "Systems with diagnosis";
+"key_systems_with_favorites" = "Favorite systems";
+"key_systems_in_danger" = "Systems in danger";
+"key_systems_in_warning" = "Systems in warning";
+"key_systems_in_monitoring" = "Systems in monitoring";
+"key_systems_in_ok" = "Healthy systems";
+
+/* Profile Settings */
+"appearance" = "Appearance";
+"theme" = "Theme";
+"language" = "Language";
+"change_password" = "Change Password";
+"privacy_policy" = "Privacy Policy";
+"powered_by" = "Powered by";
+"logout_confirmation" = "Are you sure you want to logout?";
+"logout_confirmation_message" = "You will need to login again to access your account.";
+"system_theme" = "System";
+"light_theme" = "Light";
+"dark_theme" = "Dark";
+"theme_system_description" = "Follows system setting";
+"theme_light_description" = "Light theme always";
+"theme_dark_description" = "Dark theme always";
+
+/* Change Password */
+"change_password_title" = "Change Password";
+"old_password" = "Old Password";
+"new_password" = "New Password";
+"confirm_password" = "Confirm Password";
+"update_password" = "Update Password";
+"password_changed_successfully" = "Password changed successfully";
+"old_password_empty" = "Old password is required";
+"new_password_empty" = "New password is required";
+"confirm_password_empty" = "Confirm password is required";
+"passwords_do_not_match" = "Passwords do not match";
+"password_too_short" = "Password must be at least 6 characters";
+"same_password_error" = "New password must be different from old password";
+"old_password_placeholder" = "Enter your old password";
+"new_password_placeholder" = "Enter your new password";
+"confirm_password_placeholder" = "Confirm your new password";

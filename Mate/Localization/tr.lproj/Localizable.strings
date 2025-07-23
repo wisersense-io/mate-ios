@@ -1,0 +1,199 @@
+/* Login Screen */
+"login_title" = "Giriş Yap";
+"email_placeholder" = "E-posta";
+"password_placeholder" = "Şifre";
+"remember_me" = "Beni Hatırla";
+"forgot_password" = "Şifremi Unuttum";
+"sign_in" = "Giriş Yap";
+"back" = "Geri";
+
+/* Password Reset */
+"password_reset_title" = "Şifre Sıfırlama";
+"password_reset_message" = "Lütfen e-posta adresinizi girin, size doğrulama kodu göndereceğiz.";
+"send_reset_code" = "Sıfırlama Bağlantısı Gönder";
+
+/* Verification Code */
+"verification_code_title" = "Doğrulama Kodu";
+"verification_code_message" = "E-posta adresinize gelen 6 haneli doğrulama kodunu girin.";
+"verification_code_placeholder" = "Doğrulama Kodu";
+"verify" = "Doğrula";
+"success" = "Başarılı";
+"verification_success_message" = "Doğrulama başarılı, Giriş ekranına yönlendiriliyorsunuz.";
+"ok" = "Tamam";
+
+/* Error Messages */
+"invalid_email_password" = "Geçersiz e-posta veya şifre";
+"enter_valid_email" = "Lütfen geçerli bir e-posta adresi girin";
+"login_failed" = "Giriş başarısız. Lütfen bilgilerinizi kontrol ediniz";
+"verification_code_error" = "Doğrulama kodu hatalı, Lütfen tekrar deneyin.";
+"invalid_url" = "Geçersiz istek URL'si";
+"invalid_response" = "Beklenmeyen sunucu yanıtı";
+"unknown_error" = "Bilinmeyen hata";
+"token_storage_error" = "Token saklama hatası";
+"user_not_found" = "Kullanıcı bulunamadı veya uygulama erişimi yok";
+"user_inactive" = "Kullanıcı hesabı deaktif";
+"email_not_confirmed" = "E-posta adresi doğrulanmamış";
+"password_temporary" = "Geçici şifre kullanılıyor, lütfen değiştirin";
+"network_error" = "Ağ bağlantı hatası";
+"unknown_error_code" = "Bilinmeyen hata kodu";
+"token_not_found" = "Kimlik doğrulama token'ı bulunamadı";
+"required_fields_missing" = "Gerekli alanlar eksik";
+"invalid_email_format" = "Geçersiz e-posta formatı";
+"invalid_data_format" = "Geçersiz veri formatı";
+"server_exception" = "Sunucu iç hatası oluştu";
+
+/* General */
+"loading" = "Yükleniyor...";
+"cancel" = "İptal";
+"done" = "Tamam";
+"next" = "Sonraki";
+"hello_world" = "Merhaba, dünya!";
+
+/* Language Selection */
+"select_language" = "Dil Seçin";
+"language_changed" = "Dil Değiştirildi";
+
+/* Tab Navigation */
+"dashboard" = "Gösterge Paneli";
+"projects" = "Projeler";
+"organization" = "Organizasyon";
+"systems" = "Sistemler";
+"profile" = "Profil";
+"home" = "Özet";
+
+/* Home Dashboard */
+"device_count" = "Cihazlar";
+"system_count" = "Sistemler";
+"asset_count" = "Varlıklar";
+"devices_with_alarms" = "Alarmlı Sistemler";
+"alarms_ratio" = "Alarm Oranı";
+
+/* Dashboard */
+"welcome_dashboard" = "Hoş Geldiniz";
+"dashboard_subtitle" = "Bugün neler yapmak istiyorsunuz?";
+"active_projects" = "Aktif Projeler";
+"total_tasks" = "Toplam Görevler";
+"pending_reviews" = "Bekleyen İncelemeler";
+"team_members" = "Ekip Üyeleri";
+
+/* Coming Soon Views */
+"projects_coming_soon" = "Projeler Yakında";
+"projects_description" = "Proje yönetimi özelliği yakında eklenecek.";
+"analytics_coming_soon" = "Analitik Yakında";
+"analytics_description" = "Detaylı analitik raporları yakında hazır olacak.";
+"messages_coming_soon" = "Mesajlar Yakında";
+"messages_description" = "Ekip mesajlaşma özelliği yakında aktif olacak.";
+
+/* Profile */
+"profile_title" = "Profil";
+"profile_logged_in" = "Giriş yapıldı";
+"settings" = "Ayarlar";
+"notifications" = "Bildirimler";
+"help" = "Yardım";
+"logout" = "Çıkış Yap";
+"change_password_now" = "Şimdi Değiştir";
+
+/* Health Score */
+"health_score_title" = "Sağlık Skoru";
+"loading_health_score" = "Sağlık Skoru Yükleniyor...";
+"health_score_share_message" = "Sağlık Skorum: {score}/10 🎯\n\nMate uygulamasıyla sağlık durumumu takip ediyorum!";
+
+/* Health Score Trend */
+"loading_trend_data" = "Trend Verileri Yükleniyor...";
+"weekly_trend" = "Sağlık Skoru Trendi";
+"no_data_available" = "Veri Bulunmuyor";
+"scroll_to_see_more" = "Daha fazlası için kaydırın";
+
+/* Dashboard Charts */
+"key_health_score_of_assets_distribution" = "Varlıkların Sağlık Skoru Dağılımı";
+"key_health_score_of_systems_distributions" = "Sistemlerin Sağlık Skoru Dağılımı";
+"key_alarm_distributions_of_systems" = "Sistemlerin Alarm Dağılımı";
+"key_health_score_trend_of_packets" = "Paketlerin Sağlık Skoru Trendi";
+"key_health_score_trend_of_systems" = "Sistemlerin Sağlık Skoru Trendi";
+
+/* Date Filters */
+"key_this_week" = "Bu hafta";
+"key_last_7_days" = "Son 7 gün";
+"key_last_week" = "Geçen hafta";
+"key_last_15_days" = "Son 15 gün";
+"key_last_30_days" = "Son 30 gün";
+"key_last_90_days" = "Son 90 gün";
+"key_this_month" = "Bu ay";
+"key_last_month" = "Geçen ay";
+"key_last_3_month" = "Son 3 ay";
+"key_last_6_month" = "Son 6 ay";
+
+/* Health Score Segments */
+"keyNormal" = "Normal";
+"keyMonitored" = "İzleniyor";
+"keyWarning" = "Uyarı";
+"keyDanger" = "Tehlikeli";
+
+/* Alarm Type Segments */
+"key_temperature" = "Sıcaklık";
+"key_max_rms" = "MaxRMS";
+"key_max_vrms" = "MaxVRMS";
+"key_max_cf" = "MaxCF";
+
+/* Organization Selector */
+"organization_selector" = "Organizasyon Seçimi";
+"search_organizations" = "Organizasyon Ara";
+"selected_organization" = "Seçili Organizasyon";
+"no_organizations_found" = "Organizasyon bulunamadı";
+"loading_organizations" = "Organizasyonlar yükleniyor...";
+"error_loading_organizations" = "Organizasyonlar yüklenirken hata oluştu";
+"expand" = "Genişlet";
+"collapse" = "Daralt";
+"select_organization" = "Organizasyon Seç";
+"organization_search_placeholder" = "Organizasyon ara...";
+"sub_units" = "alt birim";
+
+/* Systems */
+"systems_count" = "Sistemler";
+"assets_count" = "Varlıklar";
+"devices_count" = "Cihazlar";
+"loading_systems" = "Sistemler yükleniyor...";
+"error_loading_systems" = "Sistemler yüklenirken hata";
+"no_systems_found" = "Sistem bulunamadı";
+"retry" = "Tekrar Dene";
+"key_all_systems" = "Tüm sistemler";
+"key_systems_with_alarm" = "Alarmli sistemler";
+"key_systems_with_diagnosis" = "Tanılı sistemler";
+"key_systems_with_favorites" = "Favori sistemler";
+"key_systems_in_danger" = "Tehlikedeki sistemler";
+"key_systems_in_warning" = "Uyarıdaki sistemler";
+"key_systems_in_monitoring" = "İzlemedeki sistemler";
+"key_systems_in_ok" = "Sağlıklı sistemler";
+
+/* Profile Settings */
+"appearance" = "Görünüm";
+"theme" = "Tema";
+"language" = "Dil";
+"change_password" = "Şifre Değiştir";
+"privacy_policy" = "Gizlilik Politikası";
+"powered_by" = "tarafından desteklenmektedir";
+"logout_confirmation" = "Çıkış yapmak istediğinizden emin misiniz?";
+"logout_confirmation_message" = "Hesabınıza erişmek için tekrar giriş yapmanız gerekecek.";
+"system_theme" = "Sistem";
+"light_theme" = "Açık";
+"dark_theme" = "Koyu";
+"theme_system_description" = "Sistem ayarını takip eder";
+"theme_light_description" = "Açık tema her zaman";
+"theme_dark_description" = "Koyu tema her zaman";
+
+/* Change Password */
+"change_password_title" = "Şifre Değiştir";
+"old_password" = "Eski Şifre";
+"new_password" = "Yeni Şifre";
+"confirm_password" = "Şifre Tekrar";
+"update_password" = "Şifreyi Güncelle";
+"password_changed_successfully" = "Şifre başarıyla değiştirildi";
+"old_password_empty" = "Eski şifre gereklidir";
+"new_password_empty" = "Yeni şifre gereklidir";
+"confirm_password_empty" = "Şifre tekrarı gereklidir";
+"passwords_do_not_match" = "Şifreler eşleşmiyor";
+"password_too_short" = "Şifre en az 6 karakter olmalıdır";
+"same_password_error" = "Yeni şifre eski şifreden farklı olmalıdır";
+"old_password_placeholder" = "Eski şifrenizi girin";
+"new_password_placeholder" = "Yeni şifrenizi girin";
+"confirm_password_placeholder" = "Yeni şifrenizi tekrar girin";
