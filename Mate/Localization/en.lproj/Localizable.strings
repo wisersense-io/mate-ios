@@ -163,6 +163,9 @@
 "loading_systems" = "Loading systems...";
 "error_loading_systems" = "Error loading systems";
 "no_systems_found" = "No systems found";
+"no_systems_found_search" = "No systems found";
+"no_systems_found_search_description" = "Try adjusting your search terms or filter options";
+"search_systems_placeholder" = "Search systems...";
 "retry" = "Retry";
 "key_all_systems" = "All systems";
 "key_systems_with_alarm" = "Systems with alarm";

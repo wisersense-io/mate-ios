@@ -86,9 +86,10 @@ class SystemNetworkDataSource: SystemNetworkDataSourceProtocol {
         
         print("🌐 SystemNetworkDataSource: Fetching system health score trend from: \(urlString)")
         
-        // Create request
+        // Create request with timeout
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        request.timeoutInterval = 30.0 // 30 seconds timeout
         
         // Add authorization header
         if let token = tokenStorage.getToken() {
@@ -107,7 +108,19 @@ class SystemNetworkDataSource: SystemNetworkDataSourceProtocol {
                 throw AuthError.invalidResponse
             }
             
-            guard httpResponse.statusCode == 200 else {
+            // Handle different HTTP status codes
+            switch httpResponse.statusCode {
+            case 200:
+                break // Success
+            case 401:
+                throw AuthError.serverError("Authentication failed. Please login again.", errorCode: 401)
+            case 403:
+                throw AuthError.serverError("Access denied. You don't have permission to view this data.", errorCode: 403)
+            case 404:
+                throw AuthError.serverError("System not found or trend data unavailable.", errorCode: 404)
+            case 500...599:
+                throw AuthError.serverError("Server error. Please try again later.", errorCode: httpResponse.statusCode)
+            default:
                 throw AuthError.serverError("HTTP Error: \(httpResponse.statusCode)", errorCode: httpResponse.statusCode)
             }
             

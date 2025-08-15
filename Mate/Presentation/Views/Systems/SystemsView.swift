@@ -18,11 +18,11 @@ struct SystemsView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search Bar
+                // Search Bar - Always visible
                 searchBar
                 
-                // Systems List with Pull to Refresh
-                systemsListWithRefresh
+                // Content Area - Systems List or Empty State
+                contentArea
             }
             .background(themeManager.currentColors.primaryWorkspaceColor)
             .navigationBarTitleDisplayMode(.inline)
@@ -102,7 +102,7 @@ struct SystemsView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.6))
                 
-                TextField("Search systems...", text: $searchText)
+                TextField(NSLocalizedString("search_systems_placeholder".localized(language: localizationManager.currentLanguage), comment: "Search systems placeholder"), text: $searchText)
                     .foregroundColor(themeManager.currentColors.mainTextColor)
                     .accentColor(themeManager.currentColors.mainAccentColor)
                 
@@ -130,27 +130,45 @@ struct SystemsView: View {
         .background(themeManager.currentColors.primaryWorkspaceColor)
     }
     
-    // MARK: - Systems List with Pull to Refresh
+    // MARK: - Content Area
     
-    private var systemsListWithRefresh: some View {
+    private var contentArea: some View {
         Group {
             if viewModel.isLoading && viewModel.systems.isEmpty {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Loading state
+                VStack {
+                    Spacer()
+                    ProgressView()
+                        .scaleEffect(1.2)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let errorMessage = viewModel.errorMessage {
-                ErrorView(message: errorMessage) {
-                    Task {
-                        let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
-                        if !organizationChanged {
-                            await viewModel.loadSystems()
+                // Error state
+                VStack {
+                    Spacer()
+                    ErrorView(message: errorMessage) {
+                        Task {
+                            let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
+                            if !organizationChanged {
+                                await viewModel.loadSystems()
+                            }
                         }
                     }
-                }
-                .environmentObject(themeManager)
-            } else if viewModel.filteredSystems.isEmpty {
-                EmptyStateView()
                     .environmentObject(themeManager)
+                    Spacer()
+                }
+            } else if viewModel.filteredSystems.isEmpty {
+                // Empty state - only in content area
+                VStack {
+                    Spacer()
+                    EmptyStateView()
+                        .environmentObject(themeManager)
+                        .environmentObject(localizationManager)
+                    Spacer()
+                }
             } else {
+                // Systems list
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.filteredSystems, id: \.id) { system in
@@ -224,21 +242,28 @@ struct ErrorView: View {
 
 struct EmptyStateView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "server.rack")
+        VStack(spacing: 20) {
+            Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
                 .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.5))
             
-            Text("No systems found")
-                .foregroundColor(themeManager.currentColors.mainTextColor)
-                .font(.title3)
-            
-            Text("Try adjusting your filter or refresh the page")
-                .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
-                .multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Text(NSLocalizedString("no_systems_found_search".localized(language: localizationManager.currentLanguage), comment: "No systems found message"))
+                    .foregroundColor(themeManager.currentColors.mainTextColor)
+                    .font(.title3)
+                    .fontWeight(.medium)
+                
+                Text(NSLocalizedString("no_systems_found_search_description".localized(language: localizationManager.currentLanguage), comment: "No systems found description"))
+                    .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+            }
         }
-        .padding()
+        .padding(.horizontal, 32)
+        .padding(.vertical, 24)
     }
 }

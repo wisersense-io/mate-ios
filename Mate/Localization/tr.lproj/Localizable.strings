@@ -155,6 +155,9 @@
 "loading_systems" = "Sistemler yükleniyor...";
 "error_loading_systems" = "Sistemler yüklenirken hata";
 "no_systems_found" = "Sistem bulunamadı";
+"no_systems_found_search" = "Sistem bulunamadı";
+"no_systems_found_search_description" = "Arama terimlerinizi veya filtre seçeneklerinizi ayarlamayı deneyin";
+"search_systems_placeholder" = "Sistem ara...";
 "retry" = "Tekrar Dene";
 "key_all_systems" = "Tüm sistemler";
 "key_systems_with_alarm" = "Alarmli sistemler";
