@@ -65,7 +65,7 @@ struct SystemDetailView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 32)
                             
-                            Button("Tekrar Dene") {
+                            Button("retry".localized(language: localizationManager.currentLanguage)) {
                                 Task {
                                     let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
                                     if !organizationChanged {
@@ -73,7 +73,11 @@ struct SystemDetailView: View {
                                     }
                                 }
                             }
-                            .foregroundColor(themeManager.currentColors.mainAccentColor)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(themeManager.currentColors.mainAccentColor)
+                            .cornerRadius(8)
                         }
                         .frame(height: 250)
                         .frame(maxWidth: .infinity)
@@ -175,6 +179,9 @@ struct SystemDetailView: View {
             }
         }
         .refreshable {
+            // Add a small delay to ensure UI is ready
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            
             let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
             
             // Only refresh if organization didn't change (to avoid race condition)

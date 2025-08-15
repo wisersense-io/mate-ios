@@ -156,6 +156,7 @@ struct SystemsView: View {
                         }
                     }
                     .environmentObject(themeManager)
+                    .environmentObject(localizationManager)
                     Spacer()
                 }
             } else if viewModel.filteredSystems.isEmpty {
@@ -199,6 +200,10 @@ struct SystemsView: View {
                 }
                 .refreshable {
                     isRefreshing = true
+                    
+                    // Add a small delay to ensure UI is ready
+                    try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                    
                     // Check if organization changed and refresh if needed
                     let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
                     if !organizationChanged {
@@ -217,6 +222,7 @@ struct ErrorView: View {
     let message: String
     let retry: () -> Void
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     
     var body: some View {
         VStack(spacing: 16) {
@@ -229,9 +235,10 @@ struct ErrorView: View {
                 .multilineTextAlignment(.center)
             
             Button(action: retry) {
-                Text("Retry")
+                Text("retry".localized(language: localizationManager.currentLanguage))
                     .foregroundColor(.white)
-                    .padding()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                     .background(themeManager.currentColors.mainAccentColor)
                     .cornerRadius(8)
             }

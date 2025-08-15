@@ -26,6 +26,8 @@ class SystemsViewModel: ObservableObject {
     private let pageSize = 20
     private var currentPage = 0
     private var currentOrganizationId: String?
+    private var loadSystemsTask: Task<Void, Never>?
+    private var loadMoreTask: Task<Void, Never>?
     
     init(systemUseCase: SystemUseCase, organizationUseCase: OrganizationUseCaseProtocol, signalRManager: SignalRManagerProtocol? = nil) {
         self.systemUseCase = systemUseCase
@@ -38,90 +40,136 @@ class SystemsViewModel: ObservableObject {
     // MARK: - Data Loading
     
     func loadSystems() async {
+        // Cancel any existing load systems request
+        loadSystemsTask?.cancel()
+        
         guard !isLoading else { return }
         
         isLoading = true
         errorMessage = nil
         
-        do {
-            guard let organizationId = getOrganizationId() else {
-                errorMessage = "Organization not found"
-                isLoading = false
-                return
+        // Create a new task for this request
+        loadSystemsTask = Task { @MainActor in
+            do {
+                // Check if task was cancelled
+                try Task.checkCancellation()
+                
+                guard let organizationId = getOrganizationId() else {
+                    errorMessage = "Organization not found"
+                    isLoading = false
+                    return
+                }
+                
+                currentOrganizationId = organizationId
+                currentPage = 0
+                
+                let newSystems = try await systemUseCase.getSystems(
+                    organizationId: organizationId,
+                    filter: selectedFilter,
+                    skip: 0,
+                    take: pageSize
+                )
+                
+                // Check if task was cancelled after the network call
+                try Task.checkCancellation()
+                
+                systems = newSystems
+                hasMorePages = newSystems.count >= pageSize
+                applyFilter()
+                
+                // Prepare devices from systems
+                devices = systemUseCase.prepareDevices(from: systems)
+                print("📱 SystemsViewModel: Prepared \(devices.count) devices from \(systems.count) systems")
+                
+                // Send devices to SignalR if connected
+                if isSignalRConnected {
+                    await sendDevicesToSignalR()
+                }
+                
+            } catch is CancellationError {
+                // Don't show error for cancelled requests
+                print("🚫 SystemsViewModel: Load systems request was cancelled")
+                systems = []
+                devices = []
+            } catch {
+                // Handle network errors properly
+                let errorMessage = getErrorMessage(from: error)
+                self.errorMessage = errorMessage
+                systems = []
+                devices = []
+                print("❌ SystemsViewModel: Failed to load systems - \(error.localizedDescription)")
             }
             
-            currentOrganizationId = organizationId
-            currentPage = 0
-            
-            let newSystems = try await systemUseCase.getSystems(
-                organizationId: organizationId,
-                filter: selectedFilter,
-                skip: 0,
-                take: pageSize
-            )
-            
-            systems = newSystems
-            hasMorePages = newSystems.count >= pageSize
-            applyFilter()
-            
-            // Prepare devices from systems
-            devices = systemUseCase.prepareDevices(from: systems)
-            print("📱 SystemsViewModel: Prepared \(devices.count) devices from \(systems.count) systems")
-            
-            // Send devices to SignalR if connected
-            if isSignalRConnected {
-                await sendDevicesToSignalR()
-            }
-            
-        } catch {
-            errorMessage = error.localizedDescription
-            systems = []
-            devices = []
+            isLoading = false
         }
         
-        isLoading = false
+        await loadSystemsTask?.value
     }
     
     func loadMoreSystems() async {
+        // Cancel any existing load more request
+        loadMoreTask?.cancel()
+        
         guard !isLoadingMore && hasMorePages else { return }
         
         isLoadingMore = true
         
-        do {
-            guard let organizationId = currentOrganizationId else {
-                return
+        // Create a new task for this request
+        loadMoreTask = Task { @MainActor in
+            do {
+                // Check if task was cancelled
+                try Task.checkCancellation()
+                
+                guard let organizationId = currentOrganizationId else {
+                    return
+                }
+                
+                let skip = (currentPage + 1) * pageSize
+                let newSystems = try await systemUseCase.getSystems(
+                    organizationId: organizationId,
+                    filter: selectedFilter,
+                    skip: skip,
+                    take: pageSize
+                )
+                
+                // Check if task was cancelled after the network call
+                try Task.checkCancellation()
+                
+                systems.append(contentsOf: newSystems)
+                currentPage += 1
+                hasMorePages = newSystems.count >= pageSize
+                applyFilter()
+                
+                // Update devices
+                devices = systemUseCase.prepareDevices(from: systems)
+                print("📱 SystemsViewModel: Updated devices - now \(devices.count) devices from \(systems.count) systems")
+                
+                // Send updated devices to SignalR if connected
+                if isSignalRConnected {
+                    await sendDevicesToSignalR()
+                }
+                
+            } catch is CancellationError {
+                // Don't show error for cancelled requests
+                print("🚫 SystemsViewModel: Load more systems request was cancelled")
+            } catch {
+                // Handle network errors properly
+                let errorMessage = getErrorMessage(from: error)
+                self.errorMessage = errorMessage
+                print("❌ SystemsViewModel: Failed to load more systems - \(error.localizedDescription)")
             }
             
-            let skip = (currentPage + 1) * pageSize
-            let newSystems = try await systemUseCase.getSystems(
-                organizationId: organizationId,
-                filter: selectedFilter,
-                skip: skip,
-                take: pageSize
-            )
-            
-            systems.append(contentsOf: newSystems)
-            currentPage += 1
-            hasMorePages = newSystems.count >= pageSize
-            applyFilter()
-            
-            // Update devices
-            devices = systemUseCase.prepareDevices(from: systems)
-            print("📱 SystemsViewModel: Updated devices - now \(devices.count) devices from \(systems.count) systems")
-            
-            // Send updated devices to SignalR if connected
-            if isSignalRConnected {
-                await sendDevicesToSignalR()
-            }
-            
-        } catch {
-            errorMessage = error.localizedDescription
+            isLoadingMore = false
         }
         
-        isLoadingMore = false
+        await loadMoreTask?.value
     }
     
     func refreshSystems() async {
+        // Cancel any existing requests before starting a new one
+        loadSystemsTask?.cancel()
+        loadMoreTask?.cancel()
+        
         currentPage = 0
         hasMorePages = true
         await loadSystems()
@@ -328,5 +376,51 @@ class SystemsViewModel: ObservableObject {
     
     func getSignalRStats() -> (alive: Int, connected: Int) {
         return (alive: aliveSystems.count, connected: connectedDevices.count)
+    }
+    
+    // MARK: - Error Handling
+    
+    private func getErrorMessage(from error: Error) -> String {
+        if let authError = error as? AuthError {
+            switch authError {
+            case .networkError:
+                return "Network connection error. Please check your internet connection."
+            case .serverError(let message, let code):
+                if code == 401 {
+                    return "Authentication failed. Please login again."
+                } else if code >= 500 {
+                    return "Server error. Please try again later."
+                } else {
+                    return message.isEmpty ? "Unknown server error" : message
+                }
+            default:
+                return authError.localizedDescription
+            }
+        } else {
+            // Handle NSURLError specifically
+            let nsError = error as NSError
+            if nsError.domain == NSURLErrorDomain {
+                switch nsError.code {
+                case NSURLErrorTimedOut:
+                    return "Request timed out. Please try again."
+                case NSURLErrorNotConnectedToInternet:
+                    return "No internet connection. Please check your network."
+                case NSURLErrorCannotConnectToHost:
+                    return "Cannot connect to server. Please try again later."
+                case NSURLErrorCancelled:
+                    return "Request was cancelled"
+                default:
+                    return "Network error. Please try again."
+                }
+            }
+            return error.localizedDescription
+        }
+    }
+    
+    // MARK: - Cleanup
+    
+    deinit {
+        loadSystemsTask?.cancel()
+        loadMoreTask?.cancel()
     }
 } 
