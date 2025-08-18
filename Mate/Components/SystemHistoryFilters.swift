@@ -46,7 +46,7 @@ struct AlarmTypeFilterDropdown: View {
 // MARK: - Alarm Filter Type Dropdown
 
 struct AlarmFilterTypeDropdown: View {
-    @Binding var selectedFilterType: AlarmFilterType
+    @Binding var selectedAlarmFilterType: AlarmFilterType
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var localizationManager: LocalizationManager
     
@@ -54,11 +54,11 @@ struct AlarmFilterTypeDropdown: View {
         Menu {
             ForEach(AlarmConstants.alarmFilterDropdownData, id: \.filterType.rawValue) { item in
                 Button(action: {
-                    selectedFilterType = item.filterType
+                    selectedAlarmFilterType = item.filterType
                 }) {
                     HStack {
                         Text(item.label.localized(language: localizationManager.currentLanguage))
-                        if selectedFilterType == item.filterType {
+                        if selectedAlarmFilterType == item.filterType {
                             Image(systemName: "checkmark")
                         }
                     }
@@ -66,7 +66,7 @@ struct AlarmFilterTypeDropdown: View {
             }
         } label: {
             HStack {
-                Text(selectedFilterType.localizationKey.localized(language: localizationManager.currentLanguage))
+                Text(selectedAlarmFilterType.localizationKey.localized(language: localizationManager.currentLanguage))
                     .font(.system(size: 14))
                     .foregroundColor(themeManager.currentColors.mainTextColor)
                 
@@ -111,14 +111,14 @@ struct SystemHistoryDateFilterDropdown: View {
         } label: {
             HStack {
                 Text(getLocalizedFilterTitle(selectedDateFilter))
-                    .font(.system(size: 14))
+                    .font(.system(size: 13))
                     .foregroundColor(themeManager.currentColors.mainTextColor)
                 
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 12))
-                    .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.6))
+                    .font(.system(size: 10))
+                    .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.9))
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 8)
             .padding(.vertical, 8)
             .background(themeManager.currentColors.mainBgColor)
             .cornerRadius(8)
@@ -138,7 +138,7 @@ struct SystemHistoryDateFilterDropdown: View {
 
 struct SystemHistoryFiltersSection: View {
     @Binding var selectedAlarmType: AlarmType
-    @Binding var selectedFilterType: AlarmFilterType
+    @Binding var selectedAlarmFilterType: AlarmFilterType
     @Binding var selectedDateFilter: DashboardDateType
     let availableFilters: [DashboardDateFilter]
     let isAlarmsTab: Bool
@@ -150,18 +150,14 @@ struct SystemHistoryFiltersSection: View {
             if isAlarmsTab {
                 // First filter - Alarm Type
                 AlarmTypeFilterDropdown(selectedAlarmType: $selectedAlarmType)
-                    .environmentObject(themeManager)
-                    .environmentObject(localizationManager)
                 
                 // Second filter - Alarm Filter Type
-                AlarmFilterTypeDropdown(selectedFilterType: $selectedFilterType)
-                    .environmentObject(themeManager)
-                    .environmentObject(localizationManager)
+                AlarmFilterTypeDropdown(selectedAlarmFilterType: $selectedAlarmFilterType)
             } else {
                 // For diagnoses tab, show different filters
                 // Placeholder for now - can be expanded later
-                filterDropdown(title: "Tüm Teşhisler")
-                filterDropdown(title: "Tüm Teşhisler")
+                filterDropdown(title: "all_diagnoses".localized(language: localizationManager.currentLanguage))
+                filterDropdown(title: "all_diagnoses".localized(language: localizationManager.currentLanguage))
             }
             
             // Third filter - Date Filter (common for both tabs)
@@ -169,8 +165,6 @@ struct SystemHistoryFiltersSection: View {
                 selectedDateFilter: $selectedDateFilter,
                 availableFilters: availableFilters
             )
-            .environmentObject(themeManager)
-            .environmentObject(localizationManager)
         }
         .padding(.horizontal, 16)
     }
@@ -195,4 +189,4 @@ struct SystemHistoryFiltersSection: View {
                 .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
         )
     }
-} 
+}

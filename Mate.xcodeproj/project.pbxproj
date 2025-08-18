@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CEEB04D92E1BFF4900C679B8 /* SignalRClient in Frameworks */ = {isa = PBXBuildFile; productRef = CEEB04D82E1BFF4900C679B8 /* SignalRClient */; };
+		CEFE879A2E4F6A3700B58D18 /* SignalRClient in Frameworks */ = {isa = PBXBuildFile; productRef = CEFE87992E4F6A3700B58D18 /* SignalRClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEEB04D92E1BFF4900C679B8 /* SignalRClient in Frameworks */,
+				CEFE879A2E4F6A3700B58D18 /* SignalRClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +117,7 @@
 			);
 			name = Mate;
 			packageProductDependencies = (
-				CEEB04D82E1BFF4900C679B8 /* SignalRClient */,
+				CEFE87992E4F6A3700B58D18 /* SignalRClient */,
 			);
 			productName = Mate;
 			productReference = CE1918652E12B34700108C69 /* Mate.app */;
@@ -177,7 +177,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					CE1918642E12B34700108C69 = {
 						CreatedOnToolsVersion = 16.2;
@@ -203,7 +203,7 @@
 			mainGroup = CE19185C2E12B34700108C69;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				CEEB04D72E1BFF4900C679B8 /* XCRemoteSwiftPackageReference "signalr-client-swift" */,
+				CEFE87982E4F6A3700B58D18 /* XCRemoteSwiftPackageReference "signalr-client-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE1918662E12B34700108C69 /* Products */;
@@ -284,6 +284,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -314,6 +315,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LNZ38498ZD;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -347,6 +349,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -377,6 +380,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LNZ38498ZD;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -406,7 +410,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mate/Preview Content\"";
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -435,7 +438,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mate/Preview Content\"";
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -462,7 +464,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
@@ -481,7 +482,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
@@ -499,7 +499,6 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fizix.MateUITests;
@@ -516,7 +515,6 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LNZ38498ZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fizix.MateUITests;
@@ -570,7 +568,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		CEEB04D72E1BFF4900C679B8 /* XCRemoteSwiftPackageReference "signalr-client-swift" */ = {
+		CEFE87982E4F6A3700B58D18 /* XCRemoteSwiftPackageReference "signalr-client-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dotnet/signalr-client-swift";
 			requirement = {
@@ -581,9 +579,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CEEB04D82E1BFF4900C679B8 /* SignalRClient */ = {
+		CEFE87992E4F6A3700B58D18 /* SignalRClient */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = CEEB04D72E1BFF4900C679B8 /* XCRemoteSwiftPackageReference "signalr-client-swift" */;
+			package = CEFE87982E4F6A3700B58D18 /* XCRemoteSwiftPackageReference "signalr-client-swift" */;
 			productName = SignalRClient;
 		};
 /* End XCSwiftPackageProductDependency section */

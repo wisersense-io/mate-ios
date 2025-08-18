@@ -216,3 +216,4 @@
 /* Alarm Filters */
 "key_active_alarms" = "Aktif Alarmlar";
 "key_passive_alarms" = "Pasif Alarmlar";
+"all_diagnoses" = "Tüm Teşhisler";

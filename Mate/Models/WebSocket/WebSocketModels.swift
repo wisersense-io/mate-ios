@@ -47,12 +47,12 @@ enum SignalRConnectionState: Int {
 
 enum DeviceConnectionState: Int {
     case none = -1
-    case connected = 0
-    case disconnected = 1
+    case disconnected = 0
+    case connected = 1
 }
 
 enum AssetRunningState: Int {
     case none = -1
-    case running = 0
-    case stopped = 1
-} 
+    case stopped = 0
+    case running = 1
+}

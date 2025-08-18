@@ -6,6 +6,7 @@ protocol SignalRManagerProtocol {
     func startConnection() async throws
     func stopConnection() async
     func sendDevices(_ devices: [DeviceInfo]) async
+    func signinAsync(_ userId: String) async
     func onReceiveMessage(_ callback: @escaping (WebSocketMessage) -> Void)
     var connectionState: SignalRConnectionState { get }
     var isConnected: Bool { get }
@@ -26,17 +27,22 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
     }
     
     private var hubConnection: SignalRClient.HubConnection?
-    private let gatewayURL = "https://mategateway.fizix.ai/gateway"
+    private var gatewayURL = "https://mategateway.fizix.ai/gateway"
     private var messageCallback: ((WebSocketMessage) -> Void)?
     private var reconnectTimer: Timer?
     
     // MARK: - Initialization
     private init() {
-        setupConnection()
+        Task {
+            await setupConnection()
+        }
     }
     
     // MARK: - Connection Setup
-    private func setupConnection() {
+    private func setupConnection() async {
+        let accessToken = await getAccessToken()
+        gatewayURL += "?access_token=\(accessToken)"
+        print("Gateway Url: \(gatewayURL)")
         guard let url = URL(string: gatewayURL) else {
             print("❌ SignalR: Invalid gateway URL")
             return
@@ -46,6 +52,7 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
         hubConnection = HubConnectionBuilder()
             .withUrl(url: gatewayURL)
             .withAutomaticReconnect()
+            .withLogLevel(logLevel: .debug)
             .build()
     }
     
@@ -100,8 +107,7 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
         // Setup SignalR message handlers - Microsoft SignalR Swift API
         Task {
             // Handle device asset state changes
-            await hubConnection.on("onDeviceAssetStateChanged") { [weak self] (deviceId: String, systemId: String, state: Int) in
-                let device = WebSocketDevice(systemId: systemId, deviceId: deviceId, macAddress: nil)
+            await hubConnection.on("onDeviceAssetStateChanged") { [weak self] (device: WebSocketDevice, state: Int) in
                 let message = WebSocketMessage(
                     type: .assetRunningStateChanged,
                     data: WebSocketMessageData(device: device, state: state)
@@ -112,8 +118,7 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
             }
             
             // Handle device connection state events
-            await hubConnection.on("onDeviceConnectionStateEvent") { [weak self] (deviceId: String, systemId: String, state: Int) in
-                let device = WebSocketDevice(systemId: systemId, deviceId: deviceId, macAddress: nil)
+            await hubConnection.on("onDeviceConnectionStateEvent") { [weak self] (device: WebSocketDevice, state: Int) in
                 let message = WebSocketMessage(
                     type: .deviceConnectionStateChanged,
                     data: WebSocketMessageData(device: device, state: state)
@@ -124,8 +129,7 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
             }
             
             // Handle device connection state changes
-            await hubConnection.on("onDeviceConnectionStateChanged") { [weak self] (deviceId: String, systemId: String, state: Int) in
-                let device = WebSocketDevice(systemId: systemId, deviceId: deviceId, macAddress: nil)
+            await hubConnection.on("onDeviceConnectionStateChanged") { [weak self] (device: WebSocketDevice, state: Int) in
                 let message = WebSocketMessage(
                     type: .deviceConnectionStateChanged,
                     data: WebSocketMessageData(device: device, state: state)
@@ -141,6 +145,21 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
         messageCallback = callback
     }
     
+    // MARK: - SignIn
+    func signinAsync(_ userId: String) async {
+        guard isConnected else {
+            print("SignalR: Cannot signin - not connected")
+            return
+        }
+        do {
+            try await hubConnection?.invoke(method: "SignInAsync", arguments: userId)
+        }
+        catch {
+            print("⚠️ SignalR: Error signing in: \(error)")
+        }
+        
+    }
+    
     // MARK: - Send Messages
     func sendDevices(_ devices: [DeviceInfo]) async {
         guard isConnected else {
@@ -149,6 +168,13 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
         }
         
         do {
+            let userId = UserSessionManager.shared.currentUser?.id
+            if (userId != nil) {
+                print("UserId: \(userId!)")
+            } else {
+                print("UserId is nil")
+            }
+            try await hubConnection?.invoke(method: "SignInAsync", arguments: userId!)
             // Convert DeviceInfo to WebSocketDevice format
             let webSocketDevices = devices.map { device in
                 WebSocketDevice(

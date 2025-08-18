@@ -195,13 +195,11 @@ struct SystemHistoryView: View {
             // Filter Section with new components
             SystemHistoryFiltersSection(
                 selectedAlarmType: $viewModel.selectedAlarmType,
-                selectedFilterType: $viewModel.selectedFilterType,
+                selectedAlarmFilterType: $viewModel.selectedAlarmFilterType,
                 selectedDateFilter: $viewModel.selectedDateFilter,
                 availableFilters: viewModel.availableFilters,
                 isAlarmsTab: selectedTab == .alarms
             )
-            .environmentObject(themeManager)
-            .environmentObject(localizationManager)
             
             // Content based on selected tab
             ScrollView {
@@ -219,16 +217,23 @@ struct SystemHistoryView: View {
         .onChange(of: viewModel.selectedAlarmType) { 
             Task {
                 await viewModel.updateAlarmType(viewModel.selectedAlarmType)
+                await viewModel.loadAlarmHistory()
             }
         }
-        .onChange(of: viewModel.selectedFilterType) { 
+        .onChange(of: viewModel.selectedAlarmFilterType) {
             Task {
-                await viewModel.updateFilterType(viewModel.selectedFilterType)
+                await viewModel.updateAlarmFilterType(viewModel.selectedAlarmFilterType)
+                await viewModel.loadAlarmHistory()
             }
         }
-                 .onChange(of: viewModel.selectedDateFilter) { 
+        .onChange(of: viewModel.selectedDateFilter) {
              Task {
                  await viewModel.updateDateFilter(viewModel.selectedDateFilter)
+                 if (selectedTab == .alarms) {
+                     await viewModel.loadAlarmHistory()
+                 } else {
+                     await viewModel.loadDiagnosisHistory()
+                 }
              }
          }
          .onChange(of: selectedTab) {

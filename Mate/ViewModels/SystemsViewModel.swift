@@ -83,6 +83,7 @@ class SystemsViewModel: ObservableObject {
                 
                 // Send devices to SignalR if connected
                 if isSignalRConnected {
+                    //await signInAsync();
                     await sendDevicesToSignalR()
                 }
                 
@@ -321,6 +322,16 @@ class SystemsViewModel: ObservableObject {
         
         await signalRManager.sendDevices(devices)
         print("📡 SystemsViewModel: Sent \(devices.count) devices to SignalR")
+    }
+    
+    private func signInAsync() async {
+        let userId = UserSessionManager.shared.currentUser?.id
+        if (userId != nil) {
+            print("UserId: \(userId!)")
+            await signalRManager.signinAsync(userId!)
+        } else {
+            print("UserId is nil")
+        }
     }
     
     private func handleWebSocketMessage(_ message: WebSocketMessage) {

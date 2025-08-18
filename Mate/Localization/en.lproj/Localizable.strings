@@ -224,3 +224,4 @@
 /* Alarm Filters */
 "key_active_alarms" = "Active Alarms";
 "key_passive_alarms" = "Passive Alarms";
+"all_diagnoses" = "All Diagnoses";

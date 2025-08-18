@@ -9,7 +9,7 @@ class SystemHistoryViewModel: ObservableObject {
     
     // Filter states
     @Published var selectedAlarmType: AlarmType = .allAlarms
-    @Published var selectedFilterType: AlarmFilterType = .allAlarms
+    @Published var selectedAlarmFilterType: AlarmFilterType = .allAlarms
     @Published var selectedDateFilter: DashboardDateType = DateFilterManager.defaultSystemDetailFilter
     
     // Timeline history data (real implementation)
@@ -65,28 +65,17 @@ class SystemHistoryViewModel: ObservableObject {
         hasMorePages = true
         
         do {
-            print("🚨 SystemHistoryViewModel: Loading alarm history")
-            print("  - System: \(system.key) (\(system.id))")
-            print("  - Alarm Type: \(selectedAlarmType)")
-            print("  - Filter Type: \(selectedFilterType)")
-            print("  - Date Filter: \(selectedDateFilter)")
-            print("  - Page: \(currentPage), Size: \(pageSize)")
-            
-            // Load first page
             let historyItems = try await systemHistoryUseCase.getAlarmHistory(
                 systemId: system.id,
                 dateType: selectedDateFilter,
                 alarmType: selectedAlarmType,
-                alarmFilterType: selectedFilterType,
+                alarmFilterType: selectedAlarmFilterType,
                 skip: currentPage * pageSize,
                 take: pageSize
             )
             
-            // Replace all data (fresh load)
             timelineHistoryData = historyItems
             hasMorePages = historyItems.count >= pageSize
-            
-            print("✅ SystemHistoryViewModel: Loaded \(alarmData.count) alarm items (hasMore: \(hasMorePages))")
             
         } catch {
             alarmsError = error.localizedDescription
@@ -106,12 +95,6 @@ class SystemHistoryViewModel: ObservableObject {
         hasMorePages = true
         
         do {
-            print("🔍 SystemHistoryViewModel: Loading diagnosis history")
-            print("  - System: \(system.key) (\(system.id))")
-            print("  - Date Filter: \(selectedDateFilter)")
-            print("  - Page: \(currentPage), Size: \(pageSize)")
-            
-            // Load first page
             let historyItems = try await systemHistoryUseCase.getDiagnosisHistory(
                 systemId: system.id,
                 dateType: selectedDateFilter,
@@ -122,8 +105,6 @@ class SystemHistoryViewModel: ObservableObject {
             // Replace all data (fresh load)
             timelineHistoryData = historyItems
             hasMorePages = historyItems.count >= pageSize
-            
-            print("✅ SystemHistoryViewModel: Loaded \(diagnosisData.count) diagnosis items (hasMore: \(hasMorePages))")
             
         } catch {
             diagnosisError = error.localizedDescription
@@ -149,10 +130,10 @@ class SystemHistoryViewModel: ObservableObject {
         await loadAlarmHistory()
     }
     
-    func updateFilterType(_ filterType: AlarmFilterType) async {
-        guard selectedFilterType != filterType else { return }
+    func updateAlarmFilterType(_ alarmFilterType: AlarmFilterType) async {
+        guard selectedAlarmFilterType != alarmFilterType else { return }
         
-        selectedFilterType = filterType
+        selectedAlarmFilterType = alarmFilterType
         await loadAlarmHistory()
     }
     
@@ -160,10 +141,7 @@ class SystemHistoryViewModel: ObservableObject {
         guard selectedDateFilter != dateType else { return }
         
         selectedDateFilter = dateType
-        
-        print("Date filter changed to: \(dateType)")
-        
-        // Refresh both alarm and diagnosis data when date filter changes sequentially
+        // TODO check selected tab.
         await loadAlarmHistory()
         await loadDiagnosisHistory()
     }
