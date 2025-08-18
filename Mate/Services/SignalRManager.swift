@@ -52,7 +52,7 @@ class SignalRManager: SignalRManagerProtocol, ObservableObject {
         hubConnection = HubConnectionBuilder()
             .withUrl(url: gatewayURL)
             .withAutomaticReconnect()
-            .withLogLevel(logLevel: .debug)
+//            .withLogLevel(logLevel: .debug)
             .build()
     }
     

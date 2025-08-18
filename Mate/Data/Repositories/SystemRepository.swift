@@ -26,4 +26,22 @@ class SystemRepository: SystemRepositoryProtocol {
         
         return trendResponse.data
     }
+    
+    func getSystemLastDiagnosis(systemId: String, dateType: Int) async throws -> [LastDiagnosis] {
+        let diagnosisResponse = try await networkDataSource.fetchSystemLastDiagnosis(
+            systemId: systemId,
+            dateType: dateType
+        )
+        
+        guard !diagnosisResponse.hasError,
+              let diagnosisData = diagnosisResponse.data else {
+            if let errorMessage = diagnosisResponse.error {
+                throw AuthError.serverError(errorMessage, errorCode: diagnosisResponse.errorCode)
+            } else {
+                throw AuthError.serverError("Failed to fetch diagnosis data", errorCode: 500)
+            }
+        }
+        
+        return diagnosisData.toDomain()
+    }
 } 

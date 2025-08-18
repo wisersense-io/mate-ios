@@ -291,3 +291,17 @@
 "keyAlarmResetValue" = "End Value";
 "keyAlarmFinishedAt" = "End Date";
 "keyAlarmEndThresholdValue" = "End Threshold Value";
+
+/* Diagnosis */
+"diagnosis_title" = "Diagnoses";
+"loading_diagnosis" = "Loading diagnoses...";
+"no_diagnosis_found" = "No diagnoses found";
+"diagnosis_type_1" = "Vibration";
+"diagnosis_type_2" = "Temperature";
+"diagnosis_type_3" = "Acoustic";
+"diagnosis_type_4" = "Magnetic";
+"diagnosis_type_5" = "Proximity";
+"diagnosis_level_1" = "Low Risk";
+"diagnosis_level_2" = "Medium Risk";
+"diagnosis_level_3" = "High Risk";
+"diagnosis_level_4" = "Critical Risk";

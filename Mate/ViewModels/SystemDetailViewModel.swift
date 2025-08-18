@@ -10,6 +10,11 @@ class SystemDetailViewModel: ObservableObject {
     @Published var healthScoreTrendError: String?
     @Published var selectedDateFilter: DashboardDateType = DateFilterManager.defaultSystemDetailFilter
     
+    // Diagnosis properties
+    @Published var diagnosisData: [LastDiagnosis] = []
+    @Published var isDiagnosisLoading = false
+    @Published var diagnosisError: String?
+    
     // Available date filters (ortak kullanım)
     let availableFilters: [DashboardDateFilter] = DateFilterManager.availableFilters
     
@@ -17,6 +22,7 @@ class SystemDetailViewModel: ObservableObject {
     private let organizationUseCase: OrganizationUseCaseProtocol
     private var currentOrganizationId: String?
     private var currentTask: Task<Void, Never>?
+    private var lastDiagnosisTask: Task<Void, Never>?
     
     init(system: System, systemUseCase: SystemUseCase, organizationUseCase: OrganizationUseCaseProtocol) {
         self.system = system
@@ -97,8 +103,18 @@ class SystemDetailViewModel: ObservableObject {
     func checkAndRefreshIfOrganizationChanged() async -> Bool {
         if let newOrganizationId = getOrganizationId(),
            newOrganizationId != currentOrganizationId {
+            print("🔄 SystemDetailViewModel: Organization changed from \(currentOrganizationId ?? "nil") to \(newOrganizationId)")
             currentOrganizationId = newOrganizationId
-            await loadHealthScoreTrend()
+            
+            // Load both health score trend and diagnosis when organization changes
+            print("🔄 SystemDetailViewModel: Loading data for new organization...")
+            async let healthScoreTask = loadHealthScoreTrend()
+            async let diagnosisTask = loadSystemLastDiagnosis()
+            
+            await healthScoreTask
+            await diagnosisTask
+            print("🔄 SystemDetailViewModel: Organization change data load completed")
+            
             return true // Data was refreshed
         }
         return false // No refresh needed
@@ -164,9 +180,65 @@ class SystemDetailViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Diagnosis Methods
+    
+    func loadSystemLastDiagnosis() async {
+        print("🔄 SystemDetailViewModel: loadSystemLastDiagnosis called - current loading state: \(isDiagnosisLoading)")
+        
+        lastDiagnosisTask?.cancel()
+        
+        guard !isDiagnosisLoading else { 
+            print("🚫 SystemDetailViewModel: Diagnosis already loading, skipping")
+            return 
+        }
+        
+        print("🚀 SystemDetailViewModel: Starting diagnosis load...")
+        isDiagnosisLoading = true
+        diagnosisError = nil
+        
+        lastDiagnosisTask = Task { @MainActor in
+            do {
+                let apiDateType = DateFilterManager.getAPIDateType(for: selectedDateFilter)
+                
+                print("📊 SystemDetailViewModel: Loading diagnosis for systemId: \(system.id), filter: \(selectedDateFilter) -> API dateType: \(apiDateType)")
+                
+                let diagnosis = try await systemUseCase.getSystemLastDiagnosis(
+                    systemId: system.id,
+                    dateType: apiDateType
+                )
+                
+                diagnosisData = diagnosis
+                print("✅ SystemDetailViewModel: Successfully loaded \(diagnosis.count) diagnosis items")
+                
+            } catch {
+                let errorMessage = getErrorMessage(from: error)
+                diagnosisError = errorMessage
+                diagnosisData = []
+                print("❌ SystemDetailViewModel: Failed to load diagnosis - \(error.localizedDescription)")
+            }
+            
+            isDiagnosisLoading = false
+            print("🏁 SystemDetailViewModel: Diagnosis loading finished")
+        }
+        await lastDiagnosisTask?.value
+    }
+    
+    func refreshSystemLastDiagnosis() async {
+        print("🔄 SystemDetailViewModel: refreshSystemLastDiagnosis called")
+        
+        // Cancel any existing task and reset state
+        lastDiagnosisTask?.cancel()
+        isDiagnosisLoading = false
+        diagnosisError = nil
+        diagnosisData = []
+        
+        await loadSystemLastDiagnosis()
+    }
+    
     // MARK: - Cleanup
     
     deinit {
         currentTask?.cancel()
+        lastDiagnosisTask?.cancel()
     }
 } 

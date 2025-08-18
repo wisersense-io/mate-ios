@@ -335,8 +335,6 @@ class SystemsViewModel: ObservableObject {
     }
     
     private func handleWebSocketMessage(_ message: WebSocketMessage) {
-        print("📨 SystemsViewModel: Received WebSocket message - Type: \(message.type), SystemId: \(message.data.device.systemId), State: \(message.data.state)")
-        
         switch message.type {
         case .assetRunningStateChanged:
             handleAssetRunningStateChanged(message.data)
@@ -354,10 +352,8 @@ class SystemsViewModel: ObservableObject {
         // Update alive systems based on running state
         if state == AssetRunningState.running.rawValue {
             aliveSystems.insert(systemId)
-            print("🟢 SystemsViewModel: System \(systemId) is now RUNNING")
         } else {
             aliveSystems.remove(systemId)
-            print("🔴 SystemsViewModel: System \(systemId) is now STOPPED")
         }
     }
     
@@ -368,10 +364,8 @@ class SystemsViewModel: ObservableObject {
         // Update connected devices based on connection state
         if state == DeviceConnectionState.connected.rawValue {
             connectedDevices.insert(systemId)
-            print("🟢 SystemsViewModel: Device \(systemId) is now CONNECTED")
         } else {
             connectedDevices.remove(systemId)
-            print("🔴 SystemsViewModel: Device \(systemId) is now DISCONNECTED")
         }
     }
     

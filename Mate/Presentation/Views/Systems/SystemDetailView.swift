@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SystemDetailView: View {
     let system: System
@@ -37,6 +38,38 @@ struct SystemDetailView: View {
                     ) {
                         shareHealthScore()
                     }
+                    
+                    // Divider
+                    Divider()
+                        .background(themeManager.currentColors.mainBorderColor)
+                        .padding(.horizontal, 16)
+                    
+                    // Diagnosis Widget - Debug Version
+                    VStack {
+                        Text("Diagnosis Debug")
+                            .font(.headline)
+                        Text("Loading: \(viewModel.isDiagnosisLoading ? "YES" : "NO")")
+                        Text("Data count: \(viewModel.diagnosisData.count)")
+                        if let error = viewModel.diagnosisError {
+                            Text("Error: \(error)")
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button("Load Diagnosis") {
+                            Task {
+                                print("🔘 Manual diagnosis load triggered")
+                                await viewModel.loadSystemLastDiagnosis()
+                            }
+                        }
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
+                    .padding(.horizontal, 16)
                     
                     // Divider
                     Divider()
@@ -133,6 +166,15 @@ struct SystemDetailView: View {
                                     let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
                                     if !organizationChanged {
                                         await viewModel.updateDateFilter(filter.dateType)
+                                        
+                                        print("📱 SystemDetailView: Filter changed, reloading data...")
+                                        // Reload both health score trend and diagnosis in parallel
+                                        async let healthScoreTask = viewModel.loadHealthScoreTrend()
+                                        async let diagnosisTask = viewModel.loadSystemLastDiagnosis()
+                                        
+                                        await healthScoreTask
+                                        await diagnosisTask
+                                        print("📱 SystemDetailView: Filter reload completed")
                                     }
                                 }
                             }) {
@@ -173,10 +215,21 @@ struct SystemDetailView: View {
             // Check if organization changed and refresh if needed
             let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
             
-            // Only load data if organization didn't change (to avoid race condition)
-            if !organizationChanged {
-                await viewModel.loadHealthScoreTrend()
-            }
+                                // Only load data if organization didn't change (to avoid race condition)
+                    if !organizationChanged {
+                        print("📱 SystemDetailView: Starting parallel data load...")
+                        
+                        // Load both in parallel
+                        async let healthScoreTask = viewModel.loadHealthScoreTrend()
+                        async let diagnosisTask = viewModel.loadSystemLastDiagnosis()
+                        
+                        print("📱 SystemDetailView: Waiting for both tasks...")
+                        await healthScoreTask
+                        await diagnosisTask
+                        print("📱 SystemDetailView: Both tasks completed")
+                    } else {
+                        print("📱 SystemDetailView: Organization changed, skipping data load")
+                    }
         }
         .refreshable {
             // Add a small delay to ensure UI is ready
@@ -186,7 +239,15 @@ struct SystemDetailView: View {
             
             // Only refresh if organization didn't change (to avoid race condition)
             if !organizationChanged {
-                await viewModel.refreshHealthScoreTrend()
+                print("📱 SystemDetailView: Starting parallel refresh...")
+                
+                // Refresh both in parallel
+                async let healthScoreRefreshTask = viewModel.refreshHealthScoreTrend()
+                async let diagnosisRefreshTask = viewModel.refreshSystemLastDiagnosis()
+                
+                await healthScoreRefreshTask
+                await diagnosisRefreshTask
+                print("📱 SystemDetailView: Both refresh tasks completed")
             }
         }
     }

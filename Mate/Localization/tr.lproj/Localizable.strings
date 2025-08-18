@@ -283,3 +283,17 @@
 "keyAlarmResetValue" = "Bitiş Değeri";
 "keyAlarmFinishedAt" = "Bitiş Tarihi";
 "keyAlarmEndThresholdValue" = "Bitiş Eşik Değeri";
+
+/* Diagnosis */
+"diagnosis_title" = "Teşhisler";
+"loading_diagnosis" = "Teşhisler yükleniyor...";
+"no_diagnosis_found" = "Teşhis bulunamadı";
+"diagnosis_type_1" = "Titreşim";
+"diagnosis_type_2" = "Sıcaklık";
+"diagnosis_type_3" = "Akustik";
+"diagnosis_type_4" = "Manyetik";
+"diagnosis_type_5" = "Yakınlık";
+"diagnosis_level_1" = "Düşük Risk";
+"diagnosis_level_2" = "Orta Risk";
+"diagnosis_level_3" = "Yüksek Risk";
+"diagnosis_level_4" = "Kritik Risk";

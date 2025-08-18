@@ -28,4 +28,11 @@ class SystemUseCase {
             dateType: dateType
         )
     }
+    
+    func getSystemLastDiagnosis(systemId: String, dateType: Int) async throws -> [LastDiagnosis] {
+        return try await systemRepository.getSystemLastDiagnosis(
+            systemId: systemId,
+            dateType: dateType
+        )
+    }
 } 
