@@ -283,3 +283,11 @@
 "keyAssetPointTypeThirdShaftDriveEnd" = "3rd shaft DE";
 "keyAssetPointTypeThirdShaftNonDriveEnd" = "3rd shaft NDE";
 "keyAssetPointTypeThirdShaftNonDriveEndInputSide" = "3rd shaft NDE input side";
+
+/* Alarm Properties */
+"keyAlarmSetValue" = "Start Value";
+"keyAlarmStartedAt" = "Started Date";
+"keyAlarmStartThresholdValue" = "Start Threshold Value";
+"keyAlarmResetValue" = "End Value";
+"keyAlarmFinishedAt" = "End Date";
+"keyAlarmEndThresholdValue" = "End Threshold Value";

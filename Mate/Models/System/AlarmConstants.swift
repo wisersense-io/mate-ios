@@ -1,5 +1,39 @@
 import Foundation
+import SwiftUI
 
+// MARK: - Alarm Stage Enum
+
+enum AlarmStage: Int, CaseIterable, Codable {
+    case ok = 0
+    case monitor = 1
+    case warning = 2
+    case danger = 3
+    
+    var localizationKey: String {
+        switch self {
+        case .ok:
+            return "keyNormal"
+        case .monitor:
+            return "keyMonitored"
+        case .warning:
+            return "keyWarning"
+        case .danger:
+            return "keyDanger"
+        }
+    }
+    var stageColor: Color {
+        switch self {
+        case .ok:
+            return Color(red: 0.13, green: 0.76, blue: 1.0)
+        case .monitor:
+            return  Color(red: 1.0, green: 0.61, blue: 0.13)
+        case .warning:
+            return Color(red: 1.0, green: 0.34, blue: 0.13)
+        case .danger:
+            return Color(red: 0.82, green: 0.04, blue: 0.04)
+        }
+    }
+}
 // MARK: - Alarm Type Enum
 
 enum AlarmType: Int, CaseIterable, Codable {

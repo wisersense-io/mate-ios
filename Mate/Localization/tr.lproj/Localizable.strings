@@ -275,3 +275,11 @@
 "keyAssetPointTypeThirdShaftDriveEnd" = "3.şaft DE";
 "keyAssetPointTypeThirdShaftNonDriveEnd" = "3.şaft NDE";
 "keyAssetPointTypeThirdShaftNonDriveEndInputSide" = "3.şaft giriş tarafı NDE";
+
+/* Alarm Properties */
+"keyAlarmSetValue" = "Başlangıç Değeri";
+"keyAlarmStartedAt" = "Başlangıç Tarihi";
+"keyAlarmStartThresholdValue" = "Başlangıç Eşik Değeri";
+"keyAlarmResetValue" = "Bitiş Değeri";
+"keyAlarmFinishedAt" = "Bitiş Tarihi";
+"keyAlarmEndThresholdValue" = "Bitiş Eşik Değeri";

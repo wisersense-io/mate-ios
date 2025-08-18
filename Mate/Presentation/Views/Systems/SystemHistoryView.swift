@@ -288,13 +288,11 @@ struct SystemHistoryView: View {
             } else {
                 ForEach(viewModel.alarmData) { alarm in
                     AlarmHistoryCard(
-                        title: alarm.displayTitle,
-                        expert: alarm.expertName,
-                        startDate: alarm.formattedStartDate,
-                        asset: alarm.assetName,
-                        point: alarm.pointName
+                        timelineItem: alarm,
+                        system: system
                     )
                     .environmentObject(themeManager)
+                    .environmentObject(localizationManager)
                 }
                 
                 if viewModel.alarmData.isEmpty {
@@ -375,92 +373,144 @@ struct SystemHistoryView: View {
 // MARK: - History Cards
 
 struct AlarmHistoryCard: View {
-    let title: String
-    let expert: String
-    let startDate: String
-    let asset: String
-    let point: String
+    let timelineItem: TimelineHistoryItem
+    let system: System
     
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var localizationManager: LocalizationManager
+    
+    // Computed properties based on business logic
+    private var assetInfo: (name: String, group: AssetGroup) {
+        guard let systemInfo = system.parsedInfo,
+              let asset = systemInfo.assets.first(where: { $0.id == timelineItem.assetId }) else {
+            return ("---", .none)
+        }
+        
+        let groupValue = asset.group ?? -1
+        let group = AssetConstants.getAssetGroup(from: groupValue)
+        let name = AssetConstants.getAssetGroupDisplayName(group, localizationManager: localizationManager)
+        return (name, group)
+    }
+    
+    private var pointInfo: (name: String, type: AssetPointType) {
+        guard let systemInfo = system.parsedInfo,
+              let asset = systemInfo.assets.first(where: { $0.id == timelineItem.assetId }),
+              let pointId = timelineItem.pointId,
+              let point = asset.points.first(where: { $0.id == pointId }) else {
+            return ("---", .none)
+        }
+        
+        let pointType = AssetConstants.getAssetPointType(from: point.pointType)
+        let name = AssetConstants.getAssetPointTypeDisplayName(pointType, localizationManager: localizationManager)
+        return (name, pointType)
+    }
+    
+    private var alarmTypeTitle: String {
+        // Get alarm type title from localization
+        
+        if let alarmType = AlarmType(rawValue: timelineItem.alarmType.rawValue) {
+            return NSLocalizedString(alarmType.localizationKey, comment: "---").localized(language: localizationManager.currentLanguage)
+        } else {
+            return "---"
+        }
+        
+        
+    }
+    
+    private var alarmStageTitle: String {
+        if let alarmStageTitle = AlarmStage(rawValue: timelineItem.alarmStage) {
+            return NSLocalizedString(alarmStageTitle.localizationKey, comment: "---").localized(language: localizationManager.currentLanguage)
+        } else {
+            return "---"
+        }
+    }
+    
+    private var alarmStageColor: Color {
+        let alarmStageColor = AlarmStage(rawValue: timelineItem.alarmStage)
+        return alarmStageColor?.stageColor ?? .red
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header with title and icons
+        VStack(spacing: 0) {
+            // Header
             HStack {
-                Text(title)
+                Text(alarmTypeTitle)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(themeManager.currentColors.mainAccentColor)
                 
                 Spacer()
                 
-                HStack(spacing: 8) {
-                    // Stack icon (like in the image)
-                    Image(systemName: "square.stack.3d.up")
-                        .font(.system(size: 16))
-                        .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.6))
-                    
-                    // Signal/chart icon (red bars like in image)
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(.red)
+                Text(alarmStageTitle)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(alarmStageColor)
+            }
+            .padding(.bottom, 8)
+            
+            // Body - Alarm Details
+            VStack(spacing: 8) {
+                // Set Value
+                if let setValue = timelineItem.alarmSetValue {
+                    propertyRow(
+                        title: "keyAlarmSetValue".localized(language: localizationManager.currentLanguage),
+                        value: String(format: "%.2f", setValue)
+                    )
                 }
+                
+                // Started At
+                propertyRow(
+                    title: "keyAlarmStartedAt".localized(language: localizationManager.currentLanguage),
+                    value: AssetConstants.convertDate(timelineItem.startedAt, localizationManager: localizationManager)
+                )
+                
+                // Start Threshold Value
+                if let startThreshold = timelineItem.alarmStartThresholdValue {
+                    propertyRow(
+                        title: "keyAlarmStartThresholdValue".localized(language: localizationManager.currentLanguage),
+                        value: String(format: "%.2f", startThreshold)
+                    )
+                }
+                
+                // Reset Value (if available)
+                if let resetValue = timelineItem.alarmResetValue {
+                    propertyRow(
+                        title: "keyAlarmResetValue".localized(language: localizationManager.currentLanguage),
+                        value: String(format: "%.2f", resetValue)
+                    )
+                }
+                
+                // Finished At (if available)
+                if let finishedAt = timelineItem.finishedAt, !finishedAt.isEmpty {
+                    propertyRow(
+                        title: "keyAlarmFinishedAt".localized(language: localizationManager.currentLanguage),
+                        value: AssetConstants.convertDate(finishedAt, localizationManager: localizationManager)
+                    )
+                }
+                
+                // End Threshold Value (if available)
+                if let endThreshold = timelineItem.alarmEndThresholdValue {
+                    propertyRow(
+                        title: "keyAlarmEndThresholdValue".localized(language: localizationManager.currentLanguage),
+                        value: String(format: "%.2f", endThreshold)
+                    )
+                }
+                
+                // Asset
+                propertyRow(
+                    title: "keyAsset".localized(language: localizationManager.currentLanguage),
+                    value: assetInfo.name
+                )
+                
+                // Point
+                propertyRow(
+                    title: "keyAssetGroupPoint".localized(language: localizationManager.currentLanguage),
+                    value: pointInfo.name
+                )
             }
             
-            // Details
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text("Uzman:")
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
-                    
-                    Spacer()
-                    
-                    Text(expert)
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor)
-                }
-                
-                HStack {
-                    Text("Başlangıç Tarihi:")
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
-                    
-                    Spacer()
-                    
-                    Text(startDate)
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor)
-                }
-                
-                HStack {
-                    Text("Varlık:")
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
-                    
-                    Spacer()
-                    
-                    Text(asset)
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor)
-                }
-                
-                HStack {
-                    Text("Nokta:")
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
-                    
-                    Spacer()
-                    
-                    Text(point)
-                        .font(.system(size: 14))
-                        .foregroundColor(themeManager.currentColors.mainTextColor)
-                }
-            }
-            
-            // Info button (like in image)
+            // Footer
             HStack {
                 Button(action: {
-                    // Info action
+                    // Info action - can be implemented later
                 }) {
                     Image(systemName: "info.circle")
                         .font(.system(size: 20))
@@ -469,11 +519,63 @@ struct AlarmHistoryCard: View {
                 
                 Spacer()
             }
+            .padding(.top, 10)
         }
-        .padding(16)
+        .padding(8)
         .background(themeManager.currentColors.mainBgColor)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(themeManager.currentColors.mainBorderColor.opacity(0.2), lineWidth: 1)
+        )
+    }
+    
+    // Helper function for property rows
+    private func propertyRow(title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title + ":")
+                .font(.system(size: 14))
+                .foregroundColor(themeManager.currentColors.mainTextColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(2)
+            
+            Text(value)
+                .font(.system(size: 14))
+                .foregroundColor(themeManager.currentColors.mainTextColor)
+                .frame(alignment: .trailing)
+                .layoutPriority(3)
+        }
+    }
+}
+
+#Preview {
+    VStack(spacing: 8) {
+        HStack(spacing: 8) {
+            Text("Alarm Baslangic Zamani" + ":")
+                .font(.system(size: 14))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(2)
+            
+            Text("18.08.2025 15:32:20")
+                .font(.system(size: 14))
+                .foregroundColor(.red)
+                .frame(alignment: .trailing)
+                .layoutPriority(3)
+        }
+        HStack(spacing: 28) {
+            Text("Alarm Baslangic Zamani" + ":")
+                .font(.system(size: 14))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .layoutPriority(2)
+            
+            Text("18.08.2025 15:32:20")
+                .font(.system(size: 14))
+                .foregroundColor(.red)
+                .frame(alignment: .trailing)
+                .layoutPriority(3)
+        }
     }
 }
 

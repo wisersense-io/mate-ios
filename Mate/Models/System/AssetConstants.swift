@@ -309,8 +309,8 @@ struct AssetConstants {
         return AssetGroup.allCases.filter { $0 != .none }
     }
     
-    static func getAssetGroupDisplayName(_ group: AssetGroup, language: Language) -> String {
-        return group.localizationKey.localized(language: language)
+    static func getAssetGroupDisplayName(_ group: AssetGroup, localizationManager: LocalizationManager) -> String {
+        return NSLocalizedString(group.localizationKey, comment: "").localized(language: localizationManager.currentLanguage)
     }
     
     // MARK: - Asset Point Type Helpers
@@ -323,8 +323,8 @@ struct AssetConstants {
         return AssetPointType.allCases.filter { $0 != .none }
     }
     
-    static func getAssetPointTypeDisplayName(_ pointType: AssetPointType, language: Language) -> String {
-        return pointType.localizationKey.localized(language: language)
+    static func getAssetPointTypeDisplayName(_ pointType: AssetPointType, localizationManager: LocalizationManager) -> String {
+        return NSLocalizedString(pointType.localizationKey, comment: "").localized(language: localizationManager.currentLanguage)
     }
     
     // MARK: - Asset Group Icons (SF Symbols)
@@ -395,5 +395,56 @@ struct AssetConstants {
         case .none:
             return "questionmark.circle"
         }
+    }
+    
+    // MARK: - Date Conversion Helper
+    
+    static func convertDate(_ dateStr: String, localizationManager: LocalizationManager) -> String {
+        // Check if date string is empty or not 14 characters
+        if dateStr.isEmpty || dateStr.count != 14 {
+            return dateStr
+        }
+        
+        // Extract date components using regex pattern
+        let pattern = "([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})"
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: dateStr, range: NSRange(dateStr.startIndex..., in: dateStr)),
+              match.numberOfRanges == 7 else {
+            return dateStr
+        }
+        
+        // Extract year, month, day, hour, minute, second
+        let year = Int(String(dateStr[Range(match.range(at: 1), in: dateStr)!])) ?? 0
+        let month = Int(String(dateStr[Range(match.range(at: 2), in: dateStr)!])) ?? 0
+        let day = Int(String(dateStr[Range(match.range(at: 3), in: dateStr)!])) ?? 0
+        let hour = Int(String(dateStr[Range(match.range(at: 4), in: dateStr)!])) ?? 0
+        let minute = Int(String(dateStr[Range(match.range(at: 5), in: dateStr)!])) ?? 0
+        let second = Int(String(dateStr[Range(match.range(at: 6), in: dateStr)!])) ?? 0
+        
+        // Check for invalid year
+        if year <= 1 {
+            return dateStr
+        }
+        
+        // Create date components
+        var dateComponents = DateComponents()
+        dateComponents.year = year
+        dateComponents.month = month
+        dateComponents.day = day
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        dateComponents.second = second
+        
+        guard let date = Calendar.current.date(from: dateComponents) else {
+            return dateStr
+        }
+        
+        // Format date according to current language
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: localizationManager.currentLanguage == .turkish ? "tr_TR" : "en_US")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .medium
+        
+        return formatter.string(from: date)
     }
 }
