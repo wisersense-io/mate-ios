@@ -1,10 +1,4 @@
-//
-//  MateApp.swift
-//  Mate
-//
-//  Created by User on 30.06.2025.
-//
-
+// TODO Firebase issue: Youtube link: https://www.youtube.com/watch?v=-6kb_Sq2lrQ
 import SwiftUI
 
 @main

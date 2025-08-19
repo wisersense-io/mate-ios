@@ -28,6 +28,8 @@ class LoginViewModel: ObservableObject {
             print("Login successful for user: \(user.name)")
             print("User ID: \(user.id)")
             
+            await setDefaultOrganizationAfterLogin(user: user)
+            
             // Login successful - trigger navigation to main app
             isLoginSuccessful = true
             
@@ -83,5 +85,23 @@ class LoginViewModel: ObservableObject {
     func resetLoginState() {
         isLoginSuccessful = false
         loginError = nil
+    }
+    
+    // MARK: - Organization Management
+    
+    /// Set the first organization as default after successful login
+    private func setDefaultOrganizationAfterLogin(user: User) async {
+        guard !user.organizations.isEmpty else {
+            print("⚠️ LoginViewModel: No organizations available for user")
+            return
+        }
+        
+        let firstOrganization = user.organizations[0]
+        print("🏢 LoginViewModel: Setting first organization as default: \(firstOrganization.name) (\(firstOrganization.id))")
+        
+        // Save to OrganizationStorageService
+        let organizationStorage = DIContainer.shared.organizationUseCaseInstance
+        organizationStorage.selectOrganization(firstOrganization.id)
+        print("✅ LoginViewModel: Default organization set successfully")
     }
 }
