@@ -39,36 +39,21 @@ struct SystemDetailView: View {
                         shareHealthScore()
                     }
                     
-                    // Divider
-                    Divider()
-                        .background(themeManager.currentColors.mainBorderColor)
-                        .padding(.horizontal, 16)
                     
-                    // Diagnosis Widget - Debug Version
-                    VStack {
-                        Text("Diagnosis Debug")
-                            .font(.headline)
-                        Text("Loading: \(viewModel.isDiagnosisLoading ? "YES" : "NO")")
-                        Text("Data count: \(viewModel.diagnosisData.count)")
-                        if let error = viewModel.diagnosisError {
-                            Text("Error: \(error)")
-                                .foregroundColor(.red)
+                    // Diagnosis Widget
+                    DiagnosisWidget(
+                        diagnoses: viewModel.diagnosisData,
+                        isLoading: viewModel.isDiagnosisLoading,
+                        errorMessage: viewModel.diagnosisError
+                    ) {
+                        // Retry action
+                        Task {
+                            print("🔘 Diagnosis retry triggered")
+                            await viewModel.loadSystemLastDiagnosis()
                         }
-                        
-                        Button("Load Diagnosis") {
-                            Task {
-                                print("🔘 Manual diagnosis load triggered")
-                                await viewModel.loadSystemLastDiagnosis()
-                            }
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
                     }
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
+                    .environmentObject(themeManager)
+                    .environmentObject(localizationManager)
                     .padding(.horizontal, 16)
                     
                     // Divider
@@ -217,37 +202,27 @@ struct SystemDetailView: View {
             
                                 // Only load data if organization didn't change (to avoid race condition)
                     if !organizationChanged {
-                        print("📱 SystemDetailView: Starting parallel data load...")
-                        
-                        // Load both in parallel
                         async let healthScoreTask = viewModel.loadHealthScoreTrend()
                         async let diagnosisTask = viewModel.loadSystemLastDiagnosis()
                         
-                        print("📱 SystemDetailView: Waiting for both tasks...")
                         await healthScoreTask
                         await diagnosisTask
-                        print("📱 SystemDetailView: Both tasks completed")
                     } else {
                         print("📱 SystemDetailView: Organization changed, skipping data load")
                     }
         }
         .refreshable {
-            // Add a small delay to ensure UI is ready
-            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            try? await Task.sleep(nanoseconds: 100_000_000)
             
             let organizationChanged = await viewModel.checkAndRefreshIfOrganizationChanged()
             
-            // Only refresh if organization didn't change (to avoid race condition)
             if !organizationChanged {
-                print("📱 SystemDetailView: Starting parallel refresh...")
                 
-                // Refresh both in parallel
                 async let healthScoreRefreshTask = viewModel.refreshHealthScoreTrend()
                 async let diagnosisRefreshTask = viewModel.refreshSystemLastDiagnosis()
                 
                 await healthScoreRefreshTask
                 await diagnosisRefreshTask
-                print("📱 SystemDetailView: Both refresh tasks completed")
             }
         }
     }

@@ -305,3 +305,9 @@
 "diagnosis_level_2" = "Medium Risk";
 "diagnosis_level_3" = "High Risk";
 "diagnosis_level_4" = "Critical Risk";
+
+// Unknown diagnosis message
+"wiserSenseLocalization.key_unkown_diagnosis_type" = "Unknown Diagnosis Type";
+
+// No diagnosis found message
+"no_diagnosis_found" = "No diagnoses found";

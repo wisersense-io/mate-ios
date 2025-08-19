@@ -1,5 +1,10 @@
 import SwiftUI
 
+// Import necessary models and services
+// Note: LastDiagnosis is defined in DiagnosisDTOs.swift
+// Note: FailureDataService is defined in Services/FailureDataService.swift
+// Note: ThemeManager and LocalizationManager are defined in their respective files
+
 struct DiagnosisWidget: View {
     let diagnoses: [LastDiagnosis]
     let isLoading: Bool
@@ -8,6 +13,7 @@ struct DiagnosisWidget: View {
     
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var localizationManager: LocalizationManager
+    @StateObject private var failureDataService = FailureDataService.shared
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -106,7 +112,7 @@ struct DiagnosisWidget: View {
     private var diagnosisContentView: some View {
         VStack(spacing: 12) {
             ForEach(Array(diagnoses.enumerated()), id: \.offset) { index, diagnosis in
-                DiagnosisItemView(diagnosis: diagnosis)
+                DiagnosisItemView(diagnosis: diagnosis, failureDataService: failureDataService)
                     .environmentObject(themeManager)
                     .environmentObject(localizationManager)
                 
@@ -124,54 +130,101 @@ struct DiagnosisWidget: View {
 
 struct DiagnosisItemView: View {
     let diagnosis: LastDiagnosis
+    let failureDataService: FailureDataService
     
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var localizationManager: LocalizationManager
     
-    private var levelColor: Color {
-        switch diagnosis.level {
-        case 1:
-            return Color(hex: diagnosis.levelColor) ?? .green
-        case 2:
-            return Color(hex: diagnosis.levelColor) ?? .yellow
-        case 3:
-            return Color(hex: diagnosis.levelColor) ?? .orange
-        case 4:
-            return Color(hex: diagnosis.levelColor) ?? .red
-        default:
-            return Color(hex: diagnosis.levelColor) ?? .gray
+    // MARK: - Computed Properties
+    
+    private var failureItem: FailureItem? {
+        return failureDataService.getFailureByType(diagnosis.type)
+    }
+    
+    private var diagnosisLabel: String {
+        if let failureItem = failureItem {
+            let language = localizationManager.currentLanguage == .turkish ? "tr_TR" : "en_US"
+            return failureItem.getCaption(language: language)
+        } else {
+            // Fallback to unknown diagnosis message
+            return "wiserSenseLocalization.key_unkown_diagnosis_type".localized(language: localizationManager.currentLanguage) + " \(diagnosis.type)"
         }
+    }
+    
+    private var diagnosisLevel: DiagnosisLevel {
+        return DiagnosisLevel(rawValue: diagnosis.level) ?? .level0
+    }
+    
+    private var levelColor: Color {
+        switch diagnosisLevel {
+        case .level0: return .red
+        case .level1: return .red
+        case .level2: return .red
+        }
+    }
+    
+    private var diagnosisIconSVG: String? {
+        return failureDataService.getIconSVG(for: diagnosis.type)
+    }
+    
+    private var hasVisibleIcon: Bool {
+        return failureDataService.hasVisibleIcon(for: diagnosis.type)
     }
     
     var body: some View {
         HStack(spacing: 12) {
-            // Icon
-            Image(systemName: diagnosis.iconName)
-                .font(.system(size: 20))
-                .foregroundColor(levelColor)
-                .frame(width: 24, height: 24)
-            
-            // Content
+            // Diagnosis Label
             VStack(alignment: .leading, spacing: 4) {
-                // Type
-                Text("diagnosis_type_\(diagnosis.type)".localized(language: localizationManager.currentLanguage))
+                Text(diagnosisLabel)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(themeManager.currentColors.mainTextColor)
-                
-                // Level
-                Text("diagnosis_level_\(diagnosis.level)".localized(language: localizationManager.currentLanguage))
-                    .font(.system(size: 12))
-                    .foregroundColor(themeManager.currentColors.mainTextColor.opacity(0.7))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
             }
             
             Spacer()
             
-            // Level indicator
-            Circle()
-                .fill(levelColor)
-                .frame(width: 8, height: 8)
+            // Diagnosis SVG Icon (from FailureLists.json)
+            if hasVisibleIcon, let svgString = diagnosisIconSVG {
+                SVGView(svgString: svgString, size: 24.0)
+                    .frame(width: 24, height: 24)
+                    .environmentObject(themeManager)
+            } else {
+                // Fallback to SF Symbol based on level
+                Image(systemName: diagnosisLevel.sfSymbol)
+                    .font(.system(size: 20))
+                    .foregroundColor(levelColor)
+                    .frame(width: 24, height: 24)
+            }
+            
+            // Level indicator bars (mimicking React Native SVG bars)
+            diagnosisLevelBars
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
+    }
+    
+    // MARK: - Level Bars (mimicking React Native SVG)
+    
+    private var diagnosisLevelBars: some View {
+        HStack(spacing: 3) {
+            // Bar 1 (level >= 0)
+            Rectangle()
+                .fill(diagnosis.level >= 0 ? levelColor : Color.clear)
+                .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
+                .frame(width: 6, height: 8)
+            
+            // Bar 2 (level >= 1) 
+            Rectangle()
+                .fill(diagnosis.level >= 1 ? levelColor : Color.clear)
+                .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
+                .frame(width: 6, height: 16)
+            
+            // Bar 3 (level == 2)
+            Rectangle()
+                .fill(diagnosis.level == 2 ? levelColor : Color.clear)
+                .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
+                .frame(width: 6, height: 24)
+        }
     }
 }
 

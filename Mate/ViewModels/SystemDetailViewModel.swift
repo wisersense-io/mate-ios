@@ -198,6 +198,8 @@ class SystemDetailViewModel: ObservableObject {
         
         lastDiagnosisTask = Task { @MainActor in
             do {
+                try Task.checkCancellation()
+                
                 let apiDateType = DateFilterManager.getAPIDateType(for: selectedDateFilter)
                 
                 print("📊 SystemDetailViewModel: Loading diagnosis for systemId: \(system.id), filter: \(selectedDateFilter) -> API dateType: \(apiDateType)")

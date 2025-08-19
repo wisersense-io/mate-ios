@@ -297,3 +297,6 @@
 "diagnosis_level_2" = "Orta Risk";
 "diagnosis_level_3" = "Yüksek Risk";
 "diagnosis_level_4" = "Kritik Risk";
+
+// Unknown diagnosis message
+"wiserSenseLocalization.key_unkown_diagnosis_type" = "Bilinmeyen Teşhis Türü";
