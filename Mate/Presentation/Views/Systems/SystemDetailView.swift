@@ -39,28 +39,6 @@ struct SystemDetailView: View {
                         shareHealthScore()
                     }
                     
-                    
-                    // Diagnosis Widget
-                    DiagnosisWidget(
-                        diagnoses: viewModel.diagnosisData,
-                        isLoading: viewModel.isDiagnosisLoading,
-                        errorMessage: viewModel.diagnosisError
-                    ) {
-                        // Retry action
-                        Task {
-                            print("🔘 Diagnosis retry triggered")
-                            await viewModel.loadSystemLastDiagnosis()
-                        }
-                    }
-                    .environmentObject(themeManager)
-                    .environmentObject(localizationManager)
-                    .padding(.horizontal, 16)
-                    
-                    // Divider
-                    Divider()
-                        .background(themeManager.currentColors.mainBorderColor)
-                        .padding(.horizontal, 16)
-                    
                     // Health Score Trend Chart (SimpleLineChart from HomeView)
                     if viewModel.isHealthScoreTrendLoading {
                         ProgressView("loading_trend_data".localized(language: localizationManager.currentLanguage))
@@ -110,6 +88,19 @@ struct SystemDetailView: View {
                             trendData: viewModel.simpleLineChartData
                         )
                         .environmentObject(themeManager)
+                    }
+                    
+                    // Diagnosis Widget
+                    DiagnosisWidget(
+                        diagnoses: viewModel.diagnosisData,
+                        isLoading: viewModel.isDiagnosisLoading,
+                        errorMessage: viewModel.diagnosisError
+                    ) {
+                        // Retry action
+                        Task {
+                            print("🔘 Diagnosis retry triggered")
+                            await viewModel.loadSystemLastDiagnosis()
+                        }
                     }
                 }
                 .padding(.vertical, 16)

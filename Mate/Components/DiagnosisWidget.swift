@@ -16,23 +16,18 @@ struct DiagnosisWidget: View {
     @StateObject private var failureDataService = FailureDataService.shared
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header
+        VStack(alignment: .center, spacing: 16) {
+            // Header - Title centered with count badge
             HStack {
-                Text("diagnosis_title".localized(language: localizationManager.currentLanguage))
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(themeManager.currentColors.mainTextColor)
-                
                 Spacer()
                 
-                // Diagnoses count
-                if !diagnoses.isEmpty {
-                    Text("\(diagnoses.count)")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white)
-                        .frame(minWidth: 20, minHeight: 20)
-                        .background(Circle().fill(themeManager.currentColors.mainAccentColor))
+                HStack(spacing: 8) {
+                    Text("diagnosis_title".localized(language: localizationManager.currentLanguage))
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(themeManager.currentColors.mainTextColor)
                 }
+                
+                Spacer()
             }
             
             // Content
@@ -48,7 +43,6 @@ struct DiagnosisWidget: View {
         }
         .padding(16)
         .background(themeManager.currentColors.mainBgColor)
-        .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
     
@@ -110,16 +104,21 @@ struct DiagnosisWidget: View {
     // MARK: - Diagnosis Content View
     
     private var diagnosisContentView: some View {
-        VStack(spacing: 12) {
-            ForEach(Array(diagnoses.enumerated()), id: \.offset) { index, diagnosis in
-                DiagnosisItemView(diagnosis: diagnosis, failureDataService: failureDataService)
-                    .environmentObject(themeManager)
-                    .environmentObject(localizationManager)
-                
-                // Add divider between items (except last item)
-                if index < diagnoses.count - 1 {
-                    Divider()
-                        .background(themeManager.currentColors.mainBorderColor.opacity(0.3))
+        Group {
+            if diagnoses.count == 1 {
+                HStack {
+                    Spacer()
+                    DiagnosisItemView(diagnosis: diagnoses[0], failureDataService: failureDataService)
+                    Spacer()
+                }
+            } else {
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: 8),
+                    GridItem(.flexible(), spacing: 8)
+                ], spacing: 16) {
+                    ForEach(Array(diagnoses.enumerated()), id: \.offset) { index, diagnosis in
+                        DiagnosisItemView(diagnosis: diagnosis, failureDataService: failureDataService)
+                    }
                 }
             }
         }
@@ -172,59 +171,55 @@ struct DiagnosisItemView: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Diagnosis Label
-            VStack(alignment: .leading, spacing: 4) {
-                Text(diagnosisLabel)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(themeManager.currentColors.mainTextColor)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-            }
+        VStack(spacing: 12) {
+            Text(diagnosisLabel)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(themeManager.currentColors.mainTextColor)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
             
-            Spacer()
-            
-            // Diagnosis SVG Icon (from FailureLists.json)
+            // 2. Diagnosis SVG Icon (Middle)
             if hasVisibleIcon, let svgString = diagnosisIconSVG {
-                SVGView(svgString: svgString, size: 24.0)
-                    .frame(width: 24, height: 24)
-                    .environmentObject(themeManager)
+                SVGView(svgString: svgString, size: 32.0)
+                    .frame(width: 32, height: 32)
             } else {
                 // Fallback to SF Symbol based on level
                 Image(systemName: diagnosisLevel.sfSymbol)
-                    .font(.system(size: 20))
+                    .font(.system(size: 28))
                     .foregroundColor(levelColor)
-                    .frame(width: 24, height: 24)
+                    .frame(width: 32, height: 32)
             }
             
-            // Level indicator bars (mimicking React Native SVG bars)
+            // 3. Level indicator bars (Bottom)
             diagnosisLevelBars
         }
-        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
     }
     
     // MARK: - Level Bars (mimicking React Native SVG)
     
     private var diagnosisLevelBars: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 2) {
             // Bar 1 (level >= 0)
             Rectangle()
                 .fill(diagnosis.level >= 0 ? levelColor : Color.clear)
                 .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
-                .frame(width: 6, height: 8)
+                .frame(width: 4, height: 6)
             
             // Bar 2 (level >= 1) 
             Rectangle()
                 .fill(diagnosis.level >= 1 ? levelColor : Color.clear)
                 .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
-                .frame(width: 6, height: 16)
+                .frame(width: 4, height: 12)
             
             // Bar 3 (level == 2)
             Rectangle()
                 .fill(diagnosis.level == 2 ? levelColor : Color.clear)
                 .stroke(themeManager.currentColors.mainBorderColor, lineWidth: 1)
-                .frame(width: 6, height: 24)
+                .frame(width: 4, height: 18)
         }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -264,8 +259,8 @@ extension Color {
         // With data
         DiagnosisWidget(
             diagnoses: [
-                LastDiagnosis(level: 3, type: 1),
-                LastDiagnosis(level: 2, type: 2)
+                LastDiagnosis(level: 12, type: 1),
+                LastDiagnosis(level: 6, type: 2)
             ],
             isLoading: false,
             errorMessage: nil,
@@ -304,6 +299,5 @@ extension Color {
         .environmentObject(ThemeManager())
         .environmentObject(LocalizationManager())
     }
-    .padding()
     .background(Color(.systemGroupedBackground))
 }
