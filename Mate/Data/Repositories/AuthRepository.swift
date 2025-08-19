@@ -92,4 +92,10 @@ class AuthRepository: AuthRepositoryProtocol {
     func isLoggedIn() -> Bool {
         return tokenStorage.isTokenValid()
     }
+    
+    // MARK: - FCM Token Registration
+    
+    func registerFCMToken(_ token: String, _ userId: String) async throws {
+        try await networkDataSource.registerFCMToken(token, userId)
+    }
 } 

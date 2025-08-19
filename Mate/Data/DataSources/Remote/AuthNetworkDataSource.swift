@@ -1,10 +1,14 @@
 import Foundation
 
+// Import necessary DTOs and models
+// Note: These types are defined in other files in the project
+
 // MARK: - Network Data Source Protocol
 protocol AuthNetworkDataSourceProtocol {
     func login(request: LoginRequestDTO) async throws -> LoginResponseDTO
     func forgotPassword(request: ForgotPasswordRequestDTO) async throws -> BaseResponseDTO
     func verifyCode(request: ForgotPasswordRequestDTO) async throws -> Bool
+    func registerFCMToken(_ token: String, _ userId: String) async throws
 }
 
 // MARK: - Network Data Source Implementation
@@ -106,5 +110,34 @@ class AuthNetworkDataSource: AuthNetworkDataSourceProtocol {
         }
         
         return try JSONDecoder().decode(Bool.self, from: data)
+    }
+    
+    // MARK: - FCM Token Registration
+    
+    func registerFCMToken(_ token: String, _ userId: String) async throws {
+        guard let url = URL(string: "\(baseURL)/mobile/token") else {
+            throw AuthError.invalidURL
+        }
+        
+        
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Add authorization header
+        if let token = DIContainer.shared.getCurrentToken() {
+            urlRequest.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
+        }
+        
+        let requestBody = SaveFCMTokenRequestDTO(fcmToken: token, userId: userId)
+        
+        urlRequest.httpBody = try JSONEncoder().encode(requestBody)
+        
+        let (_, response) = try await urlSession.data(for: urlRequest)
+        
+        guard response is HTTPURLResponse else {
+            throw AuthError.invalidResponse
+        }
     }
 } 

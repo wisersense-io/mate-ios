@@ -10,4 +10,7 @@ protocol AuthRepositoryProtocol {
     func getStoredToken() -> AuthToken?
     func clearToken()
     func isLoggedIn() -> Bool
-} 
+    
+    // FCM Token Registration
+    func registerFCMToken(_ token: String, _ userId: String) async throws
+}

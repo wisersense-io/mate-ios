@@ -12,6 +12,11 @@ struct ForgotPasswordRequestDTO: Encodable {
     let verificationCode: String
 }
 
+struct SaveFCMTokenRequestDTO: Encodable {
+    let fcmToken: String
+    let userId: String
+}
+
 // MARK: - Response DTOs
 struct BaseResponseDTO: Decodable {
     let error: String?
